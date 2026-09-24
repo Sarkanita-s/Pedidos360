@@ -1,0 +1,140 @@
+<div class="catalog-container">
+
+    <header class="catalog-header">
+        <div>
+            <span class="section-label">GESTIÓN DE INVENTARIO</span>
+            <h1>Catálogo de productos</h1>
+
+            <p>Administra tus productos y revisa el stock disponible.</p>
+        </div>
+
+        <button class="primary-button" (click)="createProduct()" [disabled]="saving">
+            {{
+            saving
+            ? 'Guardando...'
+            : (editingProductId === null ? 'Guardar producto' : 'Actualizar producto')
+            }}
+        </button>
+    </header>
+
+    <section class="product-form" *ngIf="showForm">
+        <h2>Nuevo producto</h2>
+
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="newProduct.name" placeholder="Ej: Pizza familiar" />
+        </div>
+
+        <div class="form-group">
+            <label>Descripción</label>
+            <input type="text" [(ngModel)]="newProduct.description" placeholder="Descripción del producto" />
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Precio</label>
+                <input type="number" [(ngModel)]="newProduct.price" min="1" />
+            </div>
+
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" [(ngModel)]="newProduct.stock" min="0" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button class="secondary-button" (click)="showForm = false">
+                Cancelar
+            </button>
+
+            <button class="primary-button" (click)="createProduct()" [disabled]="saving">
+                {{ saving ? 'Guardando...' : 'Guardar producto' }}
+            </button>
+        </div>
+    </section>
+
+    <section class="catalog-summary">
+        <div class="summary-card">
+            <div class="summary-icon">📦</div>
+            <div>
+                <span>Total de productos</span>
+                <strong>{{ products.length }}</strong>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon">📊</div>
+            <div>
+                <span>Unidades disponibles</span>
+                <strong>{{ getTotalStock() }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <div class="catalog-toolbar">
+        <div>
+            <h2>Productos</h2>
+            <p>Listado actual del inventario</p>
+        </div>
+
+        <button class="secondary-button" (click)="loadProducts()">
+            ↻ Actualizar
+        </button>
+    </div>
+
+    <p class="status-message" *ngIf="loading">
+        Cargando productos...
+    </p>
+
+    <p class="status-message error" *ngIf="error">
+        {{ error }}
+    </p>
+
+    <section class="products-grid" *ngIf="!loading && !error">
+        <article class="product-card" *ngFor="let product of products">
+            <div class="product-top">
+                <div class="product-icon">🍕</div>
+
+                <span class="stock-badge" [class.low-stock]="product.stock <= 5">
+                    {{ product.stock > 5 ? 'En stock' : 'Stock bajo' }}
+                </span>
+            </div>
+
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <div class="product-details">
+                <div>
+                    <span>Precio</span>
+                    <strong>
+                        {{ product.price | currency:'CLP':'symbol':'1.0-0' }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Disponibles</span>
+                    <strong>{{ product.stock }} unidades</strong>
+                </div>
+            </div>
+
+            <div class="product-actions">
+                <button class="edit-button" (click)="editProduct(product)">
+                    Editar
+                </button>
+
+                <button class="delete-button" (click)="deleteProduct(product.id)">
+                    Eliminar
+                </button>
+            </div>
+        </article>
+    </section>
+
+    <div class="empty-state" *ngIf="!loading && !error && products.length === 0">
+        <span>📦</span>
+        <h3>No hay productos todavía</h3>
+        <p>Agrega tu primer producto para comenzar.</p>
+    </div>
+
+</div>
