@@ -1,0 +1,13 @@
+$kind: http-request
+url: http://localhost:8080/api/catalog/products/1
+method: PUT
+body:
+  type: json
+  content: |-
+    {
+      "name": "Hamburguesa triple",
+      "description": "Hamburguesa triple con queso cheddar",
+      "price": 9990.00,
+      "stock": 10
+    }
+order: 3000

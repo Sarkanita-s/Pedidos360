@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: b29a54fa-a710-4758-822a-9e02397771d1
+
+cloudResources:
+  collections:
+    ../postman/collections/Pedidos 360: 0aff05de-bca4-493a-ba90-1505ed3ce566
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

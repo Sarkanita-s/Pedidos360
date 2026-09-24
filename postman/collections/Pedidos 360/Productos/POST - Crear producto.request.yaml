@@ -1,0 +1,13 @@
+$kind: http-request
+url: http://localhost:8080/api/catalog/products
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "name": "Pizza familiar",
+      "description": "Pizza familiar con queso y pepperoni",
+      "price": 12990.00,
+      "stock": 25
+    }
+order: 2000

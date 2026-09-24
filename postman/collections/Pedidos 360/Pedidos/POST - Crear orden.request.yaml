@@ -1,0 +1,20 @@
+$kind: http-request
+url: http://localhost:8080/api/orders
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "customerName": "Sofia",
+      "total": 25980.00,
+      "items": [
+        {
+          "quantity": 2,
+          "unitPrice": 12990.00,
+          "product": {
+            "id": 2
+          }
+        }
+      ]
+    }
+order: 3000

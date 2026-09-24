@@ -1,0 +1,8 @@
+$kind: http-request
+name: PUT - Actualizar a DESPACHADO
+url: http://localhost:8080/api/orders/2/status
+method: PUT
+body:
+  type: json
+  content: '"DESPACHADO"'
+order: 4000

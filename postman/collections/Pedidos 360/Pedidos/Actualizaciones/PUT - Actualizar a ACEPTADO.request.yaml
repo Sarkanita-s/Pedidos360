@@ -1,0 +1,7 @@
+$kind: http-request
+url: http://localhost:8080/api/orders/4/status
+method: PUT
+body:
+  type: json
+  content: '"ACEPTADO"'
+order: 2000
