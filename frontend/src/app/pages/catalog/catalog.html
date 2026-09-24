@@ -8,47 +8,75 @@
             <p>Administra tus productos y revisa el stock disponible.</p>
         </div>
 
-        <button class="primary-button" (click)="createProduct()" [disabled]="saving">
-            {{
-            saving
-            ? 'Guardando...'
-            : (editingProductId === null ? 'Guardar producto' : 'Actualizar producto')
-            }}
+        <button class="primary-button" (click)="toggleForm()">
+            <span>{{ showForm && editingProductId === null ? '✕ Cerrar formulario' : '+ Nuevo producto' }}</span>
         </button>
     </header>
 
     <section class="product-form" *ngIf="showForm">
-        <h2>Nuevo producto</h2>
+        <h2>{{ editingProductId !== null ? 'Editar producto' : 'Nuevo producto' }}</h2>
+
+        <p class="status-message error" *ngIf="error">
+            {{ error }}
+        </p>
 
         <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" [(ngModel)]="newProduct.name" placeholder="Ej: Pizza familiar" />
+            <label for="productName">Nombre</label>
+            <input
+                id="productName"
+                name="name"
+                type="text"
+                [(ngModel)]="newProduct.name"
+                placeholder="Ej: Pizza familiar"
+            />
         </div>
 
         <div class="form-group">
-            <label>Descripción</label>
-            <input type="text" [(ngModel)]="newProduct.description" placeholder="Descripción del producto" />
+            <label for="productDescription">Descripción</label>
+            <input
+                id="productDescription"
+                name="description"
+                type="text"
+                [(ngModel)]="newProduct.description"
+                placeholder="Descripción del producto"
+            />
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label>Precio</label>
-                <input type="number" [(ngModel)]="newProduct.price" min="1" />
+                <label for="productPrice">Precio</label>
+                <input
+                    id="productPrice"
+                    name="price"
+                    type="number"
+                    [(ngModel)]="newProduct.price"
+                    min="1"
+                />
             </div>
 
             <div class="form-group">
-                <label>Stock</label>
-                <input type="number" [(ngModel)]="newProduct.stock" min="0" />
+                <label for="productStock">Stock</label>
+                <input
+                    id="productStock"
+                    name="stock"
+                    type="number"
+                    [(ngModel)]="newProduct.stock"
+                    min="0"
+                />
             </div>
         </div>
 
         <div class="form-actions">
-            <button class="secondary-button" (click)="showForm = false">
+            <button class="secondary-button" type="button" (click)="cancelForm()">
                 Cancelar
             </button>
 
-            <button class="primary-button" (click)="createProduct()" [disabled]="saving">
-                {{ saving ? 'Guardando...' : 'Guardar producto' }}
+            <button class="primary-button" type="button" (click)="createProduct()" [disabled]="saving">
+                {{
+                saving
+                ? 'Guardando...'
+                : (editingProductId === null ? 'Guardar producto' : 'Actualizar producto')
+                }}
             </button>
         </div>
     </section>
@@ -86,11 +114,11 @@
         Cargando productos...
     </p>
 
-    <p class="status-message error" *ngIf="error">
+    <p class="status-message error" *ngIf="error && !showForm">
         {{ error }}
     </p>
 
-    <section class="products-grid" *ngIf="!loading && !error">
+    <section class="products-grid" *ngIf="!loading && (!error || showForm)">
         <article class="product-card" *ngFor="let product of products">
             <div class="product-top">
                 <div class="product-icon">🍕</div>

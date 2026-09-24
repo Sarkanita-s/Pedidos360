@@ -7,10 +7,20 @@
             <p>Revisa los pedidos y su estado actual.</p>
         </div>
 
-        <button class="refresh-button" (click)="loadOrders()">
-            ↻ Actualizar
-        </button>
+        <div class="header-actions">
+            <button class="primary-button" (click)="toggleForm()">
+                <span>{{ showForm ? '✕ Cerrar formulario' : '+ Nuevo pedido' }}</span>
+            </button>
+
+            <button class="refresh-button" (click)="loadOrders()">
+                ↻ Actualizar
+            </button>
+        </div>
     </header>
+
+    <p class="status-message success" *ngIf="successMessage">
+        {{ successMessage }}
+    </p>
 
     <p class="status-message" *ngIf="loading">
         Cargando pedidos...
@@ -20,6 +30,131 @@
         {{ error }}
     </p>
 
+    <!-- FORMULARIO CREACIÓN DE PEDIDO -->
+    <section class="order-form-card" *ngIf="showForm">
+        <div class="form-card-header">
+            <div>
+                <h2>Nuevo pedido</h2>
+                <p>Ingresa los datos del cliente y los productos que solicita.</p>
+            </div>
+        </div>
+
+        <p class="status-message error" *ngIf="formError">
+            {{ formError }}
+        </p>
+
+        <div class="form-group">
+            <label for="customerName">Nombre del cliente *</label>
+            <input
+                id="customerName"
+                type="text"
+                [(ngModel)]="customerName"
+                placeholder="Ej: Juan Pérez"
+                [disabled]="submitting"
+            />
+        </div>
+
+        <div class="order-items-builder">
+            <div class="builder-header">
+                <h3>Productos a pedir</h3>
+                <button
+                    type="button"
+                    class="secondary-button add-product-btn"
+                    (click)="addItem()"
+                    [disabled]="submitting"
+                >
+                    + Agregar producto
+                </button>
+            </div>
+
+            <div class="builder-rows">
+                <div class="builder-row" *ngFor="let item of orderItems; let i = index">
+                    <div class="row-field field-product">
+                        <label>Producto</label>
+                        <select
+                            [(ngModel)]="item.productId"
+                            (ngModelChange)="onProductSelected(item)"
+                            [disabled]="submitting"
+                        >
+                            <option [ngValue]="null" disabled>-- Selecciona un producto --</option>
+                            <option
+                                *ngFor="let prod of availableProducts"
+                                [ngValue]="prod.id"
+                                [disabled]="prod.stock <= 0"
+                            >
+                                {{ prod.name }} ({{ prod.price | currency:'CLP':'symbol':'1.0-0' }} - Stock: {{ prod.stock }})
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="row-field field-qty">
+                        <label>Cantidad</label>
+                        <input
+                            type="number"
+                            min="1"
+                            [max]="getProductStock(item.productId)"
+                            [(ngModel)]="item.quantity"
+                            (ngModelChange)="onQuantityChange(item)"
+                            [disabled]="submitting || item.productId === null"
+                        />
+                    </div>
+
+                    <div class="row-field field-price">
+                        <label>Precio unitario</label>
+                        <div class="display-val">
+                            {{ getItemUnitPrice(item) | currency:'CLP':'symbol':'1.0-0' }}
+                        </div>
+                    </div>
+
+                    <div class="row-field field-subtotal">
+                        <label>Subtotal</label>
+                        <div class="display-val subtotal">
+                            {{ getItemSubtotal(item) | currency:'CLP':'symbol':'1.0-0' }}
+                        </div>
+                    </div>
+
+                    <div class="row-field field-action">
+                        <label>&nbsp;</label>
+                        <button
+                            type="button"
+                            class="delete-item-button"
+                            (click)="removeItem(i)"
+                            [disabled]="submitting"
+                            title="Quitar producto"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="builder-total-bar">
+                <span>Total del pedido:</span>
+                <strong>{{ calculateTotal() | currency:'CLP':'symbol':'1.0-0' }}</strong>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button
+                type="button"
+                class="secondary-button"
+                (click)="closeForm()"
+                [disabled]="submitting"
+            >
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                class="primary-button"
+                (click)="submitOrder()"
+                [disabled]="submitting"
+            >
+                {{ submitting ? 'Guardando pedido...' : 'Guardar pedido' }}
+            </button>
+        </div>
+    </section>
+
     <section class="orders-list" *ngIf="!loading && !error">
         <article class="order-card" *ngFor="let order of orders">
             <div class="order-header">
@@ -28,18 +163,20 @@
                     <h2>{{ order.customerName }}</h2>
                 </div>
 
-                <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
-                    {{ getStatusLabel(order.status) }}
-                </span>
+                <div class="order-header-badges">
+                    <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
+                        {{ getStatusLabel(order.status) }}
+                    </span>
 
-                <select class="status-select" [value]="order.status"
-                    (change)="updateStatus(order, $any($event.target).value)">
-                    <option value="PENDIENTE">Pendiente</option>
-                    <option value="ACEPTADO">Aceptado</option>
-                    <option value="PREPARANDO">Preparando</option>
-                    <option value="DESPACHADO">Despachado</option>
-                    <option value="CANCELADO">Cancelado</option>
-                </select>
+                    <select class="status-select" [value]="order.status"
+                        (change)="updateStatus(order, $any($event.target).value)">
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="ACEPTADO">Aceptado</option>
+                        <option value="PREPARANDO">Preparando</option>
+                        <option value="DESPACHADO">Despachado</option>
+                        <option value="CANCELADO">Cancelado</option>
+                    </select>
+                </div>
             </div>
 
             <div class="order-details">
@@ -61,21 +198,156 @@
                 </div>
             </div>
 
-            <div class="order-items" *ngIf="order.items.length > 0">
-                <h3>Detalle del pedido</h3>
-
-                <div class="order-item" *ngFor="let item of order.items">
-                    <span>
-                        {{ item.quantity }} × {{ item.product.name }}
-                    </span>
-
-                    <strong>
-                        {{ item.unitPrice * item.quantity | currency:'CLP':'symbol':'1.0-0' }}
-                    </strong>
-                </div>
+            <div class="order-card-actions">
+                <button
+                    type="button"
+                    class="detail-button"
+                    (click)="openDetail(order)"
+                    [id]="'btn-detail-' + order.id"
+                >
+                    Ver detalle
+                </button>
             </div>
         </article>
     </section>
+
+    <!-- MODAL DETALLE DE PEDIDO -->
+    <div
+        class="modal-backdrop"
+        *ngIf="selectedOrder"
+        (click)="closeDetail()"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-modal-title"
+    >
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <header class="modal-header">
+                <div>
+                    <span class="section-label">DETALLE DEL PEDIDO</span>
+                    <h2 id="detail-modal-title">Pedido #{{ selectedOrder.id }}</h2>
+                </div>
+
+                <div class="modal-header-actions">
+                    <span class="status-badge" [ngClass]="'status-' + selectedOrder.status.toLowerCase()">
+                        {{ getStatusLabel(selectedOrder.status) }}
+                    </span>
+                    <button
+                        type="button"
+                        class="modal-close-button"
+                        (click)="closeDetail()"
+                        title="Cerrar detalle (Esc)"
+                        aria-label="Cerrar detalle"
+                    >
+                        ✕
+                    </button>
+                </div>
+            </header>
+
+            <div class="modal-body">
+                <!-- Información general del pedido -->
+                <div class="detail-meta-grid">
+                    <div class="meta-card">
+                        <span class="meta-label">ID del pedido</span>
+                        <strong class="meta-value">#{{ selectedOrder.id }}</strong>
+                    </div>
+
+                    <div class="meta-card">
+                        <span class="meta-label">Nombre del cliente</span>
+                        <strong class="meta-value">{{ selectedOrder.customerName }}</strong>
+                    </div>
+
+                    <div class="meta-card">
+                        <span class="meta-label">Fecha de creación</span>
+                        <strong class="meta-value">{{ selectedOrder.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+                    </div>
+
+                    <div class="meta-card">
+                        <span class="meta-label">Estado actual</span>
+                        <div class="meta-status-control">
+                            <span class="status-badge" [ngClass]="'status-' + selectedOrder.status.toLowerCase()">
+                                {{ getStatusLabel(selectedOrder.status) }}
+                            </span>
+                            <select
+                                class="status-select"
+                                [value]="selectedOrder.status"
+                                (change)="updateStatus(selectedOrder, $any($event.target).value)"
+                            >
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="ACEPTADO">Aceptado</option>
+                                <option value="PREPARANDO">Preparando</option>
+                                <option value="DESPACHADO">Despachado</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de productos del pedido -->
+                <section class="detail-items-section">
+                    <div class="detail-items-header">
+                        <h3>Productos del pedido</h3>
+                        <span class="items-count-badge">
+                            {{ selectedOrder.items.length }} {{ selectedOrder.items.length === 1 ? 'producto' : 'productos' }}
+                        </span>
+                    </div>
+
+                    <div class="table-responsive" *ngIf="selectedOrder.items.length > 0">
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="col-center">Cantidad</th>
+                                    <th class="col-right">Precio unitario</th>
+                                    <th class="col-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of selectedOrder.items">
+                                    <td class="col-product">
+                                        <div class="product-title">{{ item.product.name }}</div>
+                                        <div class="product-subtitle" *ngIf="item.product.description">
+                                            {{ item.product.description }}
+                                        </div>
+                                    </td>
+                                    <td class="col-center col-quantity">
+                                        <span class="quantity-tag">{{ item.quantity }}</span>
+                                    </td>
+                                    <td class="col-right col-price">
+                                        {{ item.unitPrice | currency:'CLP':'symbol':'1.0-0' }}
+                                    </td>
+                                    <td class="col-right col-subtotal">
+                                        {{ (item.unitPrice * item.quantity) | currency:'CLP':'symbol':'1.0-0' }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="no-items-box" *ngIf="selectedOrder.items.length === 0">
+                        <p>Este pedido no tiene productos registrados.</p>
+                    </div>
+                </section>
+
+                <!-- Total del pedido -->
+                <div class="detail-total-box">
+                    <span class="total-caption">Total del pedido</span>
+                    <strong class="total-figure">
+                        {{ selectedOrder.total | currency:'CLP':'symbol':'1.0-0' }}
+                    </strong>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button
+                    type="button"
+                    class="secondary-button close-btn"
+                    (click)="closeDetail()"
+                >
+                    Volver a la lista
+                </button>
+            </footer>
+        </div>
+    </div>
 
     <div class="empty-state" *ngIf="!loading && !error && orders.length === 0">
         <span>📋</span>

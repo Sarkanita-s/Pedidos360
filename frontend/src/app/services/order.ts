@@ -33,6 +33,20 @@ export interface Order {
   items: OrderItem[];
 }
 
+export interface CreateOrderItemPayload {
+  quantity: number;
+  unitPrice: number;
+  product: {
+    id: number;
+  };
+}
+
+export interface CreateOrderPayload {
+  customerName: string;
+  total: number;
+  items: CreateOrderItemPayload[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -52,6 +66,10 @@ export class OrderService {
     );
   }
 
+  createOrder(order: CreateOrderPayload): Observable<Order> {
+    return this.http.post<Order>(this.apiUrl, order);
+  }
+
   updateOrderStatus(
     id: number,
     status: OrderStatus
@@ -67,3 +85,4 @@ export class OrderService {
     );
   }
 }
+

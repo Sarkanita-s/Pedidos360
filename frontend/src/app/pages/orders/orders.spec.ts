@@ -1,53 +1,70 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-export interface OrderProduct {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-}
+import { Orders } from './orders';
+import { Order } from '../../services/order';
 
-export interface OrderItem {
-  id: number;
-  product: OrderProduct;
-  quantity: number;
-  unitPrice: number;
-}
+describe('Orders Component', () => {
+  let component: Orders;
+  let fixture: ComponentFixture<Orders>;
 
-export type OrderStatus =
-  | 'PENDIENTE'
-  | 'ACEPTADO'
-  | 'PREPARANDO'
-  | 'DESPACHADO'
-  | 'CANCELADO';
+  const mockOrder: Order = {
+    id: 99,
+    customerName: 'Cliente Test',
+    status: 'PENDIENTE',
+    total: 15000,
+    createdAt: '2026-09-24T12:00:00.000Z',
+    items: [
+      {
+        id: 1,
+        product: {
+          id: 2,
+          name: 'Pizza Test',
+          description: 'Pizza de prueba',
+          price: 15000,
+          stock: 10
+        },
+        quantity: 1,
+        unitPrice: 15000
+      }
+    ]
+  };
 
-export interface Order {
-  id: number;
-  customerName: string;
-  status: OrderStatus;
-  total: number;
-  createdAt: string;
-  items: OrderItem[];
-}
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Orders],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
+    }).compileComponents();
 
-@Injectable({
-  providedIn: 'root'
-})
-export class OrderService {
+    fixture = TestBed.createComponent(Orders);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
 
-  private readonly http = inject(HttpClient);
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 
-  private readonly apiUrl =
-    'http://localhost:8080/api/orders';
+  it('should open order detail', () => {
+    expect(component.selectedOrder).toBeNull();
+    component.openDetail(mockOrder);
+    expect(component.selectedOrder).toEqual(mockOrder);
+  });
 
-  getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.apiUrl);
-  }
+  it('should close order detail', () => {
+    component.openDetail(mockOrder);
+    expect(component.selectedOrder).not.toBeNull();
+    component.closeDetail();
+    expect(component.selectedOrder).toBeNull();
+  });
 
-  getOrder(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
-  }
-}
+  it('should close order detail on escape key', () => {
+    component.openDetail(mockOrder);
+    component.onEscape();
+    expect(component.selectedOrder).toBeNull();
+  });
+});

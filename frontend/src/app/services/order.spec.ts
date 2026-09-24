@@ -1,53 +1,23 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-export interface OrderProduct {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-}
+import { OrderService } from './order';
 
-export interface OrderItem {
-  id: number;
-  product: OrderProduct;
-  quantity: number;
-  unitPrice: number;
-}
+describe('OrderService', () => {
+  let service: OrderService;
 
-export type OrderStatus =
-  | 'PENDIENTE'
-  | 'ACEPTADO'
-  | 'PREPARANDO'
-  | 'DESPACHADO'
-  | 'CANCELADO';
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
+    });
+    service = TestBed.inject(OrderService);
+  });
 
-export interface Order {
-  id: number;
-  customerName: string;
-  status: OrderStatus;
-  total: number;
-  createdAt: string;
-  items: OrderItem[];
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class OrderService {
-
-  private readonly http = inject(HttpClient);
-
-  private readonly apiUrl =
-    'http://localhost:8080/api/orders';
-
-  getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.apiUrl);
-  }
-
-  getOrder(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
-  }
-}
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});

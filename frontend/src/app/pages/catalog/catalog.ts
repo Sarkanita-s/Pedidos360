@@ -68,13 +68,69 @@ export class Catalog implements OnInit {
     stock: 0
   };
 
+  toggleForm(): void {
+    if (this.showForm && this.editingProductId === null) {
+      this.cancelForm();
+    } else {
+      this.openCreateForm();
+    }
+  }
+
+  openCreateForm(): void {
+    this.editingProductId = null;
+    this.resetProduct();
+    this.showForm = true;
+    this.error = '';
+    this.cdr.detectChanges();
+  }
+
+  openForm(): void {
+    this.openCreateForm();
+  }
+
+  cancelForm(): void {
+    this.showForm = false;
+    this.editingProductId = null;
+    this.error = '';
+    this.resetProduct();
+    this.cdr.detectChanges();
+  }
+
+  closeForm(): void {
+    this.cancelForm();
+  }
+
+  resetProduct(): void {
+    this.newProduct = {
+      name: '',
+      description: '',
+      price: 0,
+      stock: 0
+    };
+  }
+
+  saveProduct(): void {
+    this.createProduct();
+  }
+
   createProduct(): void {
+    const name = this.newProduct.name?.trim();
+    const price = Number(this.newProduct.price);
+    const stock = Number(this.newProduct.stock);
+
     if (
-      !this.newProduct.name.trim() ||
-      this.newProduct.price <= 0 ||
-      this.newProduct.stock < 0
+      !name ||
+      this.newProduct.price === null ||
+      this.newProduct.price === undefined ||
+      isNaN(price) ||
+      price <= 0 ||
+      this.newProduct.stock === null ||
+      this.newProduct.stock === undefined ||
+      isNaN(stock) ||
+      stock < 0
     ) {
       this.error = 'Completa los datos correctamente.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -83,11 +139,18 @@ export class Catalog implements OnInit {
 
     console.log('ID en edición:', this.editingProductId);
 
+    const payload = {
+      name: name,
+      description: this.newProduct.description?.trim() || '',
+      price: price,
+      stock: stock
+    };
+
     if (this.editingProductId !== null) {
       // ACTUALIZAR producto existente
       this.productService.updateProduct(
         this.editingProductId,
-        this.newProduct
+        payload
       ).subscribe({
         next: () => {
           console.log('Producto actualizado correctamente');
@@ -103,7 +166,7 @@ export class Catalog implements OnInit {
 
     } else {
       // CREAR producto nuevo
-      this.productService.createProduct(this.newProduct).subscribe({
+      this.productService.createProduct(payload).subscribe({
         next: () => {
           console.log('Producto creado correctamente');
           this.finishSaving();
@@ -123,12 +186,7 @@ export class Catalog implements OnInit {
     this.showForm = false;
     this.editingProductId = null;
 
-    this.newProduct = {
-      name: '',
-      description: '',
-      price: 0,
-      stock: 0
-    };
+    this.resetProduct();
 
     this.loadProducts();
   }
@@ -168,5 +226,6 @@ export class Catalog implements OnInit {
     this.error = '';
 
     console.log('Editando producto con ID:', this.editingProductId);
+    this.cdr.detectChanges();
   }
 }
