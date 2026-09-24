@@ -1,6 +1,7 @@
 package com.pedidos360.backend.controller;
 
 import com.pedidos360.backend.model.Order;
+import com.pedidos360.backend.model.OrderStatus;
 import com.pedidos360.backend.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +37,15 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdOrder);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Order> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestBody OrderStatus newStatus) {
+
+        Order updatedOrder = orderService.updateOrderStatus(id, newStatus);
+
+        return ResponseEntity.ok(updatedOrder);
     }
 }

@@ -3,6 +3,8 @@ package com.pedidos360.backend.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -20,6 +22,10 @@ public class Order {
     private BigDecimal total;
 
     private LocalDateTime createdAt;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private List<OrderItem> items = new ArrayList<>();
 
     public Order() {
         this.status = OrderStatus.PENDIENTE;
@@ -57,4 +63,13 @@ public class Order {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
 }
