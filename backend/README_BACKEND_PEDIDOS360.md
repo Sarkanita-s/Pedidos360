@@ -415,6 +415,9 @@ Si no existe stock suficiente, la API devuelve `409 Conflict`:
 ------------------------------------------------------------------------
 
 ## 11. Resumen de archivos
+
+Cada descripción tiene como máximo 30 palabras.
+
   ------------------------------------------------------------------------
   Archivo                              Descripción
   ------------------------------------ -----------------------------------
@@ -512,3 +515,143 @@ Si no existe stock suficiente, la API devuelve `409 Conflict`:
   -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
+
+
+## Instalación e inicialización de PostgreSQL
+
+Esta guía está orientada a Linux basado en Fedora/Nobara.
+
+### 1. Instalar PostgreSQL
+
+```bash
+sudo dnf update -y
+sudo dnf install postgresql-server postgresql-contrib -y
+```
+
+### 2. Inicializar PostgreSQL
+
+```bash
+sudo postgresql-setup --initdb
+```
+
+Si el sistema indica que ya está inicializado, no repitas este comando.
+
+### 3. Iniciar y habilitar el servicio
+
+```bash
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+sudo systemctl status postgresql
+```
+
+Para salir de la pantalla de estado, presiona `q`.
+
+### 4. Entrar como administrador
+
+```bash
+sudo -u postgres psql
+```
+
+### 5. Crear el usuario de la aplicación
+
+Dentro de `psql`:
+
+```sql
+CREATE USER pedidos_user WITH PASSWORD 'CAMBIAR_ESTA_CONTRASENA';
+```
+
+Si el usuario ya existe:
+
+```sql
+ALTER USER pedidos_user WITH PASSWORD 'CAMBIAR_ESTA_CONTRASENA';
+```
+
+### 6. Crear la base de datos
+
+```sql
+CREATE DATABASE pedidos360 OWNER pedidos_user;
+```
+
+Para revisar las bases de datos:
+
+```sql
+\l
+```
+
+### 7. Otorgar permisos
+
+Conéctate a la base de datos:
+
+```sql
+\c pedidos360
+```
+
+Ejecuta:
+
+```sql
+GRANT USAGE, CREATE ON SCHEMA public TO pedidos_user;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pedidos_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO pedidos_user;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL PRIVILEGES ON TABLES TO pedidos_user;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL PRIVILEGES ON SEQUENCES TO pedidos_user;
+```
+
+Sal de PostgreSQL:
+
+```sql
+\q
+```
+
+### 8. Configurar `application.properties`
+
+En `backend/src/main/resources/application.properties`:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/pedidos360
+spring.datasource.username=pedidos_user
+spring.datasource.password=CAMBIAR_ESTA_CONTRASENA
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+server.port=8080
+```
+
+La contraseña debe coincidir con la asignada a `pedidos_user`.
+
+### 9. Probar la conexión
+
+```bash
+psql -h localhost -U pedidos_user -d pedidos360 -W
+```
+
+Dentro de `psql`:
+
+```sql
+\dt
+```
+
+Para salir:
+
+```sql
+\q
+```
+
+### 10. Crear las tablas desde Spring Boot
+
+Desde la carpeta del backend:
+
+```bash
+cd ~/Pedidos360/backend
+mvn spring-boot:run
+```
+
+Con `spring.jpa.hibernate.ddl-auto=update`, Hibernate crea o actualiza las tablas según las entidades JPA.
+
+> Para producción, se recomienda utilizar migraciones controladas, como Flyway o Liquibase, en lugar de depender de `ddl-auto=update`.

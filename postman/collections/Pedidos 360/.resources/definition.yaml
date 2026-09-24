@@ -1,9 +1,7 @@
 $kind: collection
 description: ""
 auth:
-  - id: c45a7607-d3ac-4dfb-92f5-cc871f273a24
-    type: basic
-    name: basic auth
-    credentials:
-      username: user
-      password: ""
+  type: basic
+  credentials:
+    username: user
+    password: 4dab5584-cfe0-4539-b730-c633e8ef36a5
