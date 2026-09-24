@@ -1,3 +1,4 @@
+
 package com.pedidos360.backend.exception;
 
 import org.springframework.http.HttpStatus;
@@ -10,15 +11,27 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InvalidOrderStatusException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidOrderStatus(
-            InvalidOrderStatusException exception) {
+        @ExceptionHandler(InvalidOrderStatusException.class)
+        public ResponseEntity<Map<String, String>> handleInvalidOrderStatus(
+                        InvalidOrderStatusException exception) {
 
-        Map<String, String> response = Map.of(
-                "error", exception.getMessage());
+                Map<String, String> response = Map.of(
+                                "error", exception.getMessage());
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
-    }
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(response);
+        }
+
+        @ExceptionHandler(InsufficientStockException.class)
+        public ResponseEntity<Map<String, String>> handleInsufficientStock(
+                        InsufficientStockException exception) {
+
+                Map<String, String> response = Map.of(
+                                "error", exception.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(response);
+        }
 }
