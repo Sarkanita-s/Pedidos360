@@ -1,0 +1,181 @@
+<div class="dashboard-container">
+
+    <!-- ── HEADER ──────────────────────────────────────────── -->
+    <header class="dash-header">
+        <div>
+            <span class="section-label">PANEL PRINCIPAL</span>
+            <h1>Dashboard</h1>
+            <p class="dash-subtitle">Resumen general de Pedidos360 en tiempo real.</p>
+        </div>
+
+        <div class="dash-header-actions">
+            <button class="refresh-btn" (click)="loadData()" [disabled]="loading" title="Actualizar datos">
+                <span [class.spinning]="loading">↻</span> Actualizar
+            </button>
+        </div>
+    </header>
+
+    <!-- ── ESTADO DE CARGA ──────────────────────────────────── -->
+    <div class="loading-state" *ngIf="loading">
+        <div class="loading-dots">
+            <span></span><span></span><span></span>
+        </div>
+        <p>Cargando datos del panel…</p>
+    </div>
+
+    <!-- ── ESTADO DE ERROR ──────────────────────────────────── -->
+    <div class="error-state" *ngIf="!loading && error">
+        <span class="error-icon">⚠️</span>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadData()">Reintentar</button>
+    </div>
+
+    <!-- ── CONTENIDO PRINCIPAL ─────────────────────────────── -->
+    <ng-container *ngIf="!loading && !error">
+
+        <!-- Tarjetas de estadísticas -->
+        <section class="stats-grid" aria-label="Estadísticas generales">
+
+            <div class="stat-card stat-purple">
+                <div class="stat-top">
+                    <span class="stat-label">Total de pedidos</span>
+                    <span class="stat-icon">📦</span>
+                </div>
+                <div class="stat-value">{{ stats.totalOrders }}</div>
+                <div class="stat-foot">todos los registros</div>
+            </div>
+
+            <div class="stat-card stat-orange">
+                <div class="stat-top">
+                    <span class="stat-label">Pedidos pendientes</span>
+                    <span class="stat-icon">⏳</span>
+                </div>
+                <div class="stat-value">{{ stats.pendingOrders }}</div>
+                <div class="stat-foot">esperando atención</div>
+            </div>
+
+            <div class="stat-card stat-blue">
+                <div class="stat-top">
+                    <span class="stat-label">Aceptados / En preparación</span>
+                    <span class="stat-icon">🔄</span>
+                </div>
+                <div class="stat-value">{{ stats.activeOrders }}</div>
+                <div class="stat-foot">en proceso activo</div>
+            </div>
+
+            <div class="stat-card stat-green">
+                <div class="stat-top">
+                    <span class="stat-label">Pedidos despachados</span>
+                    <span class="stat-icon">🚚</span>
+                </div>
+                <div class="stat-value">{{ stats.dispatchedOrders }}</div>
+                <div class="stat-foot">entregados al cliente</div>
+            </div>
+
+            <div class="stat-card stat-pink">
+                <div class="stat-top">
+                    <span class="stat-label">Productos en catálogo</span>
+                    <span class="stat-icon">🏷️</span>
+                </div>
+                <div class="stat-value">{{ stats.totalProducts }}</div>
+                <div class="stat-foot">productos registrados</div>
+            </div>
+
+        </section>
+
+        <!-- ── CONTENIDO SECUNDARIO ───────────────────────── -->
+        <div class="dash-grid">
+
+            <!-- Pedidos recientes -->
+            <section class="dash-panel recent-orders-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Pedidos recientes</h2>
+                        <p>Últimos 5 pedidos registrados</p>
+                    </div>
+                    <a routerLink="/orders" class="panel-link">Ver todos →</a>
+                </div>
+
+                <div class="orders-table-wrapper" *ngIf="recentOrders.length > 0">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cliente</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th class="col-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let order of recentOrders">
+                                <td class="col-id">#{{ order.id }}</td>
+                                <td>{{ order.customerName }}</td>
+                                <td>
+                                    <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                                        {{ getStatusLabel(order.status) }}
+                                    </span>
+                                </td>
+                                <td class="col-date">{{ order.createdAt | date:'dd/MM/yy HH:mm' }}</td>
+                                <td class="col-right col-total">{{ order.total | currency:'CLP':'symbol':'1.0-0' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty-panel" *ngIf="recentOrders.length === 0">
+                    <span>📋</span>
+                    <p>No hay pedidos registrados aún.</p>
+                </div>
+            </section>
+
+            <!-- Accesos rápidos -->
+            <aside class="dash-panel quick-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Accesos rápidos</h2>
+                        <p>Navega a las secciones principales</p>
+                    </div>
+                </div>
+
+                <nav class="quick-nav" aria-label="Navegación rápida">
+
+                    <a routerLink="/orders" class="quick-card" id="quick-orders">
+                        <div class="quick-icon qc-purple">📦</div>
+                        <div class="quick-text">
+                            <strong>Gestión de pedidos</strong>
+                            <span>Crea, revisa y actualiza el estado de los pedidos.</span>
+                        </div>
+                        <span class="quick-arrow">›</span>
+                    </a>
+
+                    <a routerLink="/catalog" class="quick-card" id="quick-catalog">
+                        <div class="quick-icon qc-pink">🏷️</div>
+                        <div class="quick-text">
+                            <strong>Catálogo de productos</strong>
+                            <span>Administra precios, stock y descripción de productos.</span>
+                        </div>
+                        <span class="quick-arrow">›</span>
+                    </a>
+
+                </nav>
+
+                <!-- Mini resumen catálogo -->
+                <div class="catalog-preview" *ngIf="products.length > 0">
+                    <div class="catalog-preview-header">
+                        <span class="catalog-preview-title">Productos recientes</span>
+                        <a routerLink="/catalog" class="panel-link">Ver catálogo →</a>
+                    </div>
+                    <ul class="product-mini-list">
+                        <li *ngFor="let p of products.slice(0, 4)" class="product-mini-item">
+                            <span class="product-mini-name">{{ p.name }}</span>
+                            <span class="product-mini-price">{{ p.price | currency:'CLP':'symbol':'1.0-0' }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+        </div>
+    </ng-container>
+
+</div>

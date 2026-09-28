@@ -8,6 +8,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import {
   OrderService,
@@ -24,7 +25,7 @@ interface FormOrderItem {
 
 @Component({
   selector: 'app-orders',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './orders.html',
   styleUrl: './orders.scss'
 })

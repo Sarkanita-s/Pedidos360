@@ -1,0 +1,16 @@
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-login',
+  imports: [RouterLink],
+  templateUrl: './login.html',
+  styleUrl: './login.scss'
+})
+export class Login {
+
+  /** Placeholder — se implementará con Microsoft Entra ID en la siguiente etapa. */
+  onMicrosoftLogin(): void {
+    console.log('TODO: iniciar flujo OAuth con Microsoft Entra ID');
+  }
+}

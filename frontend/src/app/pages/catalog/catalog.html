@@ -8,9 +8,14 @@
             <p>Administra tus productos y revisa el stock disponible.</p>
         </div>
 
-        <button class="primary-button" (click)="toggleForm()">
-            <span>{{ showForm && editingProductId === null ? '✕ Cerrar formulario' : '+ Nuevo producto' }}</span>
-        </button>
+        <div class="header-actions">
+            <a routerLink="/dashboard" class="back-button">
+                ← Dashboard
+            </a>
+            <button class="primary-button" (click)="toggleForm()">
+                <span>{{ showForm && editingProductId === null ? '✕ Cerrar formulario' : '+ Nuevo producto' }}</span>
+            </button>
+        </div>
     </header>
 
     <section class="product-form" *ngIf="showForm">

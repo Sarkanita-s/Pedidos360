@@ -1,0 +1,72 @@
+<div class="login-page">
+
+    <!-- Panel izquierdo: decorativo -->
+    <aside class="login-brand-panel" aria-hidden="true">
+        <div class="brand-bg"></div>
+        <div class="brand-content">
+            <div class="brand-icon">P</div>
+            <h1 class="brand-name">Pedidos<span>360</span></h1>
+            <p class="brand-tagline">Gestiona pedidos y catálogo<br>desde un solo lugar.</p>
+
+            <ul class="brand-features">
+                <li><span class="feat-icon">📦</span> Gestión de pedidos en tiempo real</li>
+                <li><span class="feat-icon">🏷️</span> Catálogo de productos centralizado</li>
+                <li><span class="feat-icon">📊</span> Panel de control con métricas clave</li>
+                <li><span class="feat-icon">🔒</span> Acceso seguro con cuenta institucional</li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Panel derecho: formulario de login -->
+    <main class="login-form-panel">
+        <div class="login-card">
+
+            <!-- Logo móvil (visible solo en pantallas pequeñas) -->
+            <div class="mobile-brand">
+                <div class="brand-icon-sm">P</div>
+                <span class="mobile-brand-name">Pedidos<strong>360</strong></span>
+            </div>
+
+            <!-- Cabecera -->
+            <header class="login-header">
+                <h2>Iniciar sesión</h2>
+                <p>Accede al sistema con tu cuenta institucional para gestionar pedidos y el catálogo de productos.</p>
+            </header>
+
+            <!-- Botón Microsoft -->
+            <div class="login-actions">
+                <button
+                    id="btn-microsoft-login"
+                    class="microsoft-button"
+                    type="button"
+                    (click)="onMicrosoftLogin()"
+                >
+                    <svg class="ms-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" aria-hidden="true">
+                        <rect x="1"  y="1"  width="9" height="9" fill="#f25022"/>
+                        <rect x="11" y="1"  width="9" height="9" fill="#7fba00"/>
+                        <rect x="1"  y="11" width="9" height="9" fill="#00a4ef"/>
+                        <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+                    </svg>
+                    Iniciar sesión con Microsoft
+                </button>
+            </div>
+
+            <!-- Aviso de cuenta institucional -->
+            <p class="institutional-note">
+                🔒 Este sistema utiliza <strong>autenticación institucional</strong> a través de Microsoft. No se requiere contraseña adicional.
+            </p>
+
+            <!-- Separador -->
+            <div class="divider"><span>o</span></div>
+
+            <!-- Enlace al Dashboard -->
+            <div class="back-link-wrapper">
+                <a routerLink="/dashboard" class="back-link" id="link-back-dashboard">
+                    ← Volver al Dashboard
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+</div>

@@ -8,6 +8,10 @@
         </div>
 
         <div class="header-actions">
+            <a routerLink="/dashboard" class="back-button">
+                ← Dashboard
+            </a>
+
             <button class="primary-button" (click)="toggleForm()">
                 <span>{{ showForm ? '✕ Cerrar formulario' : '+ Nuevo pedido' }}</span>
             </button>

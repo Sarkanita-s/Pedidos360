@@ -1,12 +1,13 @@
 
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ProductService, Product } from '../../services/product';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-catalog',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './catalog.html',
   styleUrl: './catalog.scss'
 })

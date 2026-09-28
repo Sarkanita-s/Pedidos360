@@ -1,0 +1,320 @@
+// ── Variables (paleta Pedidos360) ─────────────────────────────
+$purple:        #8b5cf6;
+$purple-dark:   #7045ca;
+$purple-light:  #f0e9ff;
+$purple-border: #ddd0f7;
+$pink:          #ec4899;
+$text-primary:  #272238;
+$text-muted:    #89839a;
+$bg-page:       #f7f5fc;
+$bg-card:       #ffffff;
+
+// ── Layout base: página completa en 2 columnas ────────────────
+.login-page {
+    display: flex;
+    min-height: 100vh;
+    font-family: Inter, "Segoe UI", sans-serif;
+    background: $bg-page;
+}
+
+// ── Panel izquierdo — decorativo ──────────────────────────────
+.login-brand-panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44%;
+    min-height: 100vh;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.brand-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #171625 0%, #2e1f52 55%, #3b1f6e 100%);
+
+    // Orbes decorativos
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.18;
+    }
+
+    &::before {
+        width: 420px;
+        height: 420px;
+        top: -100px;
+        right: -120px;
+        background: radial-gradient(circle, $purple, transparent 70%);
+    }
+
+    &::after {
+        width: 300px;
+        height: 300px;
+        bottom: -80px;
+        left: -60px;
+        background: radial-gradient(circle, $pink, transparent 70%);
+    }
+}
+
+.brand-content {
+    position: relative;
+    z-index: 1;
+    padding: 40px 48px;
+    color: #fff;
+}
+
+// Logo y nombre
+.brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, $purple, $pink);
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
+
+.brand-name {
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.1;
+
+    span { color: #c084fc; }
+}
+
+.brand-tagline {
+    margin: 0 0 40px;
+    color: #b8b2d0;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+// Lista de características
+.brand-features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #d0cce6;
+        line-height: 1.4;
+    }
+}
+
+.feat-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    width: 30px;
+    text-align: center;
+}
+
+// ── Panel derecho — formulario ────────────────────────────────
+.login-form-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    min-height: 100vh;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+// Logo compacto móvil
+.mobile-brand {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+
+.brand-icon-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, $purple, $pink);
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+}
+
+.mobile-brand-name {
+    font-size: 20px;
+    color: $text-primary;
+    letter-spacing: -0.5px;
+
+    strong { color: $purple; }
+}
+
+// Cabecera de la tarjeta
+.login-header {
+    margin-bottom: 32px;
+
+    h2 {
+        margin: 0 0 10px;
+        font-size: 30px;
+        font-weight: 900;
+        color: $text-primary;
+        letter-spacing: -0.8px;
+    }
+
+    p {
+        margin: 0;
+        color: $text-muted;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+}
+
+// ── Botón Microsoft ───────────────────────────────────────────
+.login-actions {
+    margin-bottom: 20px;
+}
+
+.microsoft-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    padding: 15px 20px;
+    border: 1.5px solid $purple-border;
+    border-radius: 14px;
+    background: $bg-card;
+    color: $text-primary;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    box-shadow: 0 4px 18px rgba(39, 34, 56, 0.07);
+
+    &:hover {
+        background: $purple-light;
+        border-color: #baa4ee;
+        box-shadow: 0 8px 28px rgba(139, 92, 246, 0.16);
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 10px rgba(139, 92, 246, 0.12);
+    }
+}
+
+.ms-logo {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+// ── Aviso institucional ───────────────────────────────────────
+.institutional-note {
+    margin: 0 0 24px;
+    padding: 14px 16px;
+    background: $purple-light;
+    border: 1px solid $purple-border;
+    border-radius: 12px;
+    color: #5e3ea1;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+
+    strong { color: $purple-dark; }
+}
+
+// ── Separador ─────────────────────────────────────────────────
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    color: #ccc8d8;
+    font-size: 12px;
+
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #ede7f6;
+    }
+
+    span {
+        flex-shrink: 0;
+    }
+}
+
+// ── Enlace de vuelta al Dashboard ─────────────────────────────
+.back-link-wrapper {
+    text-align: center;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: $text-muted;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    transition: all 0.18s ease;
+
+    &:hover {
+        color: $purple;
+        background: $purple-light;
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────
+@media (max-width: 820px) {
+    .login-brand-panel {
+        display: none;
+    }
+
+    .login-form-panel {
+        padding: 32px 20px;
+    }
+
+    .mobile-brand {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        max-width: 100%;
+    }
+
+    .login-header h2 {
+        font-size: 26px;
+    }
+}
