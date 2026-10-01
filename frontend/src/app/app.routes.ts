@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { MsalGuard } from '@azure/msal-angular';
+
 import { Catalog } from './pages/catalog/catalog';
 import { Orders } from './pages/orders/orders';
 import { Dashboard } from './pages/dashboard/dashboard';
@@ -11,19 +13,22 @@ export const routes: Routes = [
         pathMatch: 'full'
     },
     {
+        path: 'login',
+        component: Login
+    },
+    {
         path: 'dashboard',
-        component: Dashboard
+        component: Dashboard,
+        canActivate: [MsalGuard]
     },
     {
         path: 'catalog',
-        component: Catalog
+        component: Catalog,
+        canActivate: [MsalGuard]
     },
     {
         path: 'orders',
-        component: Orders
-    },
-    {
-        path: 'login',
-        component: Login
+        component: Orders,
+        canActivate: [MsalGuard]
     }
 ];
