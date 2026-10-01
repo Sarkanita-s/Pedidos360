@@ -18,7 +18,7 @@ export class ProductService {
   private readonly http = inject(HttpClient);
 
   private readonly apiUrl =
-    'http://localhost:8080/api/catalog/products';
+    'http://pedidos360-backend.us-east-1.elasticbeanstalk.com/api/catalog/products';
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl);

@@ -54,7 +54,7 @@ export class OrderService {
   private readonly http = inject(HttpClient);
 
   private readonly apiUrl =
-    'http://localhost:8080/api/orders';
+    'http://pedidos360-backend.us-east-1.elasticbeanstalk.com/api/orders';
 
   getOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.apiUrl);

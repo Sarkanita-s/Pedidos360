@@ -9,9 +9,20 @@
         </div>
 
         <div class="dash-header-actions">
+
             <button class="refresh-btn" (click)="loadData()" [disabled]="loading" title="Actualizar datos">
-                <span [class.spinning]="loading">↻</span> Actualizar
+
+                <span [class.spinning]="loading">↻</span>
+                Actualizar
+
             </button>
+
+            <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+
+                Cerrar sesión
+
+            </button>
+
         </div>
     </header>
 

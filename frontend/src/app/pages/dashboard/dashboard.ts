@@ -11,6 +11,7 @@ import { RouterLink } from '@angular/router';
 import { OrderService, Order } from '../../services/order';
 import { ProductService, Product } from '../../services/product';
 import { forkJoin } from 'rxjs';
+import { MsalService } from '@azure/msal-angular';
 
 export interface DashboardStats {
   totalOrders: number;
@@ -30,6 +31,7 @@ export class Dashboard implements OnInit {
   private readonly orderService = inject(OrderService);
   private readonly productService = inject(ProductService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly msalService = inject(MsalService);
 
   loading = true;
   error = '';
@@ -98,5 +100,9 @@ export class Dashboard implements OnInit {
 
   getStatusClass(status: string): string {
     return 'status-' + status.toLowerCase();
+  }
+
+  logout(): void {
+    this.msalService.logoutRedirect();
   }
 }
