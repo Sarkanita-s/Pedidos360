@@ -2,24 +2,33 @@ package com.pedidos360.backend.config;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtClaimValidator;
+
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+
 import org.springframework.security.web.SecurityFilterChain;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
         private static final String ISSUER = "https://sts.windows.net/501361f2-a641-4fba-b6a9-954644204a59/";
@@ -33,15 +42,19 @@ public class SecurityConfig {
                 http
                                 .csrf(csrf -> csrf.disable())
 
-                                .cors(cors -> {
-                                })
+                                .cors(cors -> cors.configurationSource(
+                                                corsConfigurationSource()))
 
                                 .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                org.springframework.http.HttpMethod.OPTIONS,
+                                                                "/**")
+                                                .permitAll()
                                                 .requestMatchers("/error").permitAll()
                                                 .anyRequest().authenticated())
 
-                                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
-                                }));
+                                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(
+                                                jwtAuthenticationConverter())));
 
                 return http.build();
         }
@@ -58,17 +71,23 @@ public class SecurityConfig {
                 OAuth2TokenValidator<Jwt> audienceValidator = new JwtClaimValidator<>(
                                 "aud",
                                 audience -> {
-                                        if (!(audience instanceof java.util.List<?> audiences)) {
-                                                return false;
+
+                                        if (audience instanceof String audienceString) {
+                                                return AUDIENCE.equals(audienceString);
                                         }
 
-                                        return audiences.contains(AUDIENCE);
+                                        if (audience instanceof java.util.Collection<?> audiences) {
+                                                return audiences.contains(AUDIENCE);
+                                        }
+
+                                        return false;
                                 });
 
                 decoder.setJwtValidator(
                                 JwtValidators.createDefaultWithValidators(
-                                                issuerValidator,
-                                                audienceValidator));
+                                                List.of(
+                                                                issuerValidator,
+                                                                audienceValidator)));
 
                 return decoder;
         }
@@ -79,7 +98,8 @@ public class SecurityConfig {
                 CorsConfiguration configuration = new CorsConfiguration();
 
                 configuration.setAllowedOrigins(
-                                Collections.singletonList("http://localhost:4200"));
+                                Collections.singletonList(
+                                                "http://localhost:4200"));
 
                 configuration.setAllowedMethods(
                                 Arrays.asList(
@@ -92,14 +112,46 @@ public class SecurityConfig {
                 configuration.setAllowedHeaders(
                                 Arrays.asList(
                                                 "Authorization",
-                                                "Content-Type"));
+                                                "Content-Type",
+                                                "Accept",
+                                                "Origin"));
+
+                configuration.setExposedHeaders(
+                                Collections.singletonList(
+                                                "Authorization"));
 
                 configuration.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-                source.registerCorsConfiguration("/**", configuration);
+                source.registerCorsConfiguration(
+                                "/**",
+                                configuration);
 
                 return source;
         }
+
+        @Bean
+        public JwtAuthenticationConverter jwtAuthenticationConverter() {
+
+                JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+                converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+
+                        Object roles = jwt.getClaims().get("roles");
+
+                        if (!(roles instanceof java.util.Collection<?> roleCollection)) {
+                                return Collections.emptyList();
+                        }
+
+                        return roleCollection.stream()
+                                        .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                                        "ROLE_" + role.toString()))
+                                        .map(authority -> (org.springframework.security.core.GrantedAuthority) authority)
+                                        .toList();
+                });
+
+                return converter;
+        }
+
 }

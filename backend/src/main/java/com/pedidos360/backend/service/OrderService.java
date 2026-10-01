@@ -1,4 +1,3 @@
-
 package com.pedidos360.backend.service;
 
 import com.pedidos360.backend.exception.InsufficientStockException;
@@ -10,6 +9,7 @@ import com.pedidos360.backend.model.Product;
 import com.pedidos360.backend.repository.OrderRepository;
 import com.pedidos360.backend.repository.ProductRepository;
 
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,30 +29,50 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<Order> getAllOrders(Jwt jwt) {
+
+        if (hasRole(jwt, "Admin") || hasRole(jwt, "Operador")) {
+            return orderRepository.findAll();
+        }
+
+        return orderRepository.findByOwnerOid(getOwnerOid(jwt));
     }
 
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
+    public Order getOrderById(Long id, Jwt jwt) {
+
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        if (hasRole(jwt, "Admin") || hasRole(jwt, "Operador")) {
+            return order;
+        }
+
+        if (!getOwnerOid(jwt).equals(order.getOwnerOid())) {
+            throw new RuntimeException(
+                    "No tienes permiso para ver este pedido");
+        }
+
+        return order;
     }
 
-    public Order createOrder(Order order) {
+    public Order createOrder(Order order, Jwt jwt) {
+
         order.setStatus(OrderStatus.PENDIENTE);
+        order.setOwnerOid(getOwnerOid(jwt));
 
         return orderRepository.save(order);
     }
 
     @Transactional
-    public Order updateOrderStatus(Long id, OrderStatus newStatus) {
+    public Order updateOrderStatus(
+            Long id,
+            OrderStatus newStatus) {
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
         OrderStatus currentStatus = order.getStatus();
 
-        // No se permiten cambios desde estados finales
         if (currentStatus == OrderStatus.DESPACHADO
                 || currentStatus == OrderStatus.CANCELADO) {
 
@@ -60,7 +80,6 @@ public class OrderService {
                     "El pedido ya se encuentra en un estado final");
         }
 
-        // Validar transiciones permitidas
         boolean validTransition = switch (currentStatus) {
 
             case PENDIENTE ->
@@ -84,7 +103,6 @@ public class OrderService {
                             + currentStatus + " -> " + newStatus);
         }
 
-        // Descontar stock solamente al aceptar por primera vez
         if (newStatus == OrderStatus.ACEPTADO
                 && currentStatus != OrderStatus.ACEPTADO) {
 
@@ -94,7 +112,8 @@ public class OrderService {
 
                 Product product = productRepository.findById(productId)
                         .orElseThrow(() -> new RuntimeException(
-                                "Producto no encontrado: " + productId));
+                                "Producto no encontrado: "
+                                        + productId));
 
                 if (product.getStock() < item.getQuantity()) {
                     throw new InsufficientStockException(
@@ -112,5 +131,28 @@ public class OrderService {
         order.setStatus(newStatus);
 
         return orderRepository.save(order);
+    }
+
+    private String getOwnerOid(Jwt jwt) {
+
+        String oid = jwt.getClaimAsString("oid");
+
+        if (oid != null && !oid.isBlank()) {
+            return oid;
+        }
+
+        return jwt.getSubject();
+    }
+
+    private boolean hasRole(Jwt jwt, String role) {
+
+        Object roles = jwt.getClaims().get("roles");
+
+        if (!(roles instanceof List<?> roleList)) {
+            return false;
+        }
+
+        return roleList.stream()
+                .anyMatch(r -> role.equals(r.toString()));
     }
 }

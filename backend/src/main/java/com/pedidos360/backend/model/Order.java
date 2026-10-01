@@ -1,6 +1,7 @@
 package com.pedidos360.backend.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ public class Order {
     private Long id;
 
     private String customerName;
+
+    private String ownerOid;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -44,6 +47,14 @@ public class Order {
         this.customerName = customerName;
     }
 
+    public String getOwnerOid() {
+        return ownerOid;
+    }
+
+    public void setOwnerOid(String ownerOid) {
+        this.ownerOid = ownerOid;
+    }
+
     public OrderStatus getStatus() {
         return status;
     }
@@ -71,5 +82,4 @@ public class Order {
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
-
 }
