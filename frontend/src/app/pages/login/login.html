@@ -1,19 +1,56 @@
 <div class="login-page">
 
-    <!-- Panel izquierdo: decorativo -->
+    <!-- Panel izquierdo: decorativo de alta fidelidad -->
     <aside class="login-brand-panel" aria-hidden="true">
         <div class="brand-bg"></div>
         <div class="brand-content">
-            <div class="brand-icon">P</div>
-            <h1 class="brand-name">Pedidos<span>360</span></h1>
-            <p class="brand-tagline">Gestiona pedidos y catálogo<br>desde un solo lugar.</p>
+            <div class="brand-badge-pill">
+                <span class="badge-dot"></span>
+                <span>Plataforma Operativa Enterprise</span>
+            </div>
 
-            <ul class="brand-features">
-                <li><span class="feat-icon">📦</span> Gestión de pedidos en tiempo real</li>
-                <li><span class="feat-icon">🏷️</span> Catálogo de productos centralizado</li>
-                <li><span class="feat-icon">📊</span> Panel de control con métricas clave</li>
-                <li><span class="feat-icon">🔒</span> Acceso seguro con cuenta institucional</li>
-            </ul>
+            <div class="brand-header-group">
+                <div class="brand-icon">P</div>
+                <h1 class="brand-name">Pedidos<span>360</span></h1>
+            </div>
+
+            <p class="brand-tagline">
+                Optimiza la operación de pedidos, stock de productos y métricas de despacho en una sola interfaz inteligente.
+            </p>
+
+            <div class="brand-features-grid">
+                <div class="feat-card">
+                    <span class="feat-icon">📦</span>
+                    <div class="feat-info">
+                        <strong>Control de pedidos</strong>
+                        <span>Ciclo completo desde recepción hasta despacho.</span>
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">🏷️</span>
+                    <div class="feat-info">
+                        <strong>Catálogo y stock</strong>
+                        <span>Precios, disponibilidad y alertas de stock bajo.</span>
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">📊</span>
+                    <div class="feat-info">
+                        <strong>Métricas en vivo</strong>
+                        <span>Visibilidad total del estado operativo al instante.</span>
+                    </div>
+                </div>
+
+                <div class="feat-card">
+                    <span class="feat-icon">🛡️</span>
+                    <div class="feat-info">
+                        <strong>Acceso institucional</strong>
+                        <span>Seguridad corporativa con Microsoft Entra ID.</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </aside>
 
@@ -29,8 +66,9 @@
 
             <!-- Cabecera -->
             <header class="login-header">
+                <span class="login-subtitle">ACCESO AL SISTEMA</span>
                 <h2>Iniciar sesión</h2>
-                <p>Accede al sistema con tu cuenta institucional para gestionar pedidos y el catálogo de productos.</p>
+                <p>Ingresa con tu cuenta institucional para administrar los pedidos y el inventario del negocio.</p>
             </header>
 
             <!-- Botón Microsoft -->
@@ -47,14 +85,18 @@
                         <rect x="1"  y="11" width="9" height="9" fill="#00a4ef"/>
                         <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
                     </svg>
-                    Iniciar sesión con Microsoft
+                    <span>Iniciar sesión con Microsoft</span>
                 </button>
             </div>
 
             <!-- Aviso de cuenta institucional -->
-            <p class="institutional-note">
-                🔒 Este sistema utiliza <strong>autenticación institucional</strong> a través de Microsoft. No se requiere contraseña adicional.
-            </p>
+            <div class="institutional-note">
+                <span class="note-icon">🔒</span>
+                <div>
+                    <strong>Autenticación corporativa protegida</strong>
+                    <p>Accede con las credenciales de tu organización. No se requiere contraseña adicional ni configuración extra.</p>
+                </div>
+            </div>
 
             <!-- Separador -->
             <div class="divider"><span>o</span></div>
@@ -62,7 +104,7 @@
             <!-- Enlace al Dashboard -->
             <div class="back-link-wrapper">
                 <a routerLink="/dashboard" class="back-link" id="link-back-dashboard">
-                    ← Volver al Dashboard
+                    <span>←</span> Ir al Dashboard
                 </a>
             </div>
 

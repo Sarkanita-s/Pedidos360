@@ -1,44 +1,70 @@
 <div class="dashboard-container">
 
-    <!-- ── HEADER ──────────────────────────────────────────── -->
-    <header class="dash-header">
-        <div>
-            <span class="section-label">PANEL PRINCIPAL</span>
-            <h1>Dashboard</h1>
-            <p class="dash-subtitle">Resumen general de Pedidos360 en tiempo real.</p>
+    <!-- ── BARRA SUPERIOR DE NAVEGACIÓN ────────────────────────────── -->
+    <nav class="app-topbar" aria-label="Navegación principal">
+        <a routerLink="/dashboard" class="brand-wrapper">
+            <div class="brand-symbol">P</div>
+            <div class="brand-title">
+                <strong>Pedidos<span>360</span></strong>
+                <small>Gestión Integral</small>
+            </div>
+        </a>
+
+        <div class="nav-pills">
+            <a routerLink="/dashboard" class="nav-pill active">
+                <span>📊</span> Dashboard
+            </a>
+            <a routerLink="/orders" class="nav-pill">
+                <span>📦</span> Pedidos
+            </a>
+            <a routerLink="/catalog" class="nav-pill">
+                <span>🏷️</span> Catálogo
+            </a>
         </div>
 
         <div class="dash-header-actions">
+            <div class="system-status-chip">
+                <span class="status-dot-pulse"></span>
+                <span>En línea</span>
+            </div>
 
             <button class="refresh-btn" (click)="loadData()" [disabled]="loading" title="Actualizar datos">
-
                 <span [class.spinning]="loading">↻</span>
-                Actualizar
-
+                <span>Actualizar</span>
             </button>
 
             <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
-
-                Cerrar sesión
-
+                <span>Cerrar sesión</span>
             </button>
+        </div>
+    </nav>
 
+    <!-- ── HEADER DE BIENVENIDA ────────────────────────────── -->
+    <header class="dash-header">
+        <div class="header-intro">
+            <span class="section-label">PANEL PRINCIPAL</span>
+            <h1>Dashboard</h1>
+            <p class="dash-subtitle">Resumen general de Pedidos360 en tiempo real.</p>
         </div>
     </header>
 
     <!-- ── ESTADO DE CARGA ──────────────────────────────────── -->
     <div class="loading-state" *ngIf="loading">
-        <div class="loading-dots">
-            <span></span><span></span><span></span>
+        <div class="loading-spinner-wrap">
+            <div class="loading-spinner"></div>
+            <div class="loading-dots">
+                <span></span><span></span><span></span>
+            </div>
         </div>
-        <p>Cargando datos del panel…</p>
+        <p>Cargando datos del panel en tiempo real…</p>
     </div>
 
     <!-- ── ESTADO DE ERROR ──────────────────────────────────── -->
     <div class="error-state" *ngIf="!loading && error">
-        <span class="error-icon">⚠️</span>
+        <div class="error-badge">⚠️</div>
+        <h3>Ocurrió un problema</h3>
         <p>{{ error }}</p>
-        <button class="retry-btn" (click)="loadData()">Reintentar</button>
+        <button class="retry-btn" (click)="loadData()">Reintentar conexión</button>
     </div>
 
     <!-- ── CONTENIDO PRINCIPAL ─────────────────────────────── -->
@@ -53,7 +79,9 @@
                     <span class="stat-icon">📦</span>
                 </div>
                 <div class="stat-value">{{ stats.totalOrders }}</div>
-                <div class="stat-foot">todos los registros</div>
+                <div class="stat-foot">
+                    <span class="stat-dot"></span> todos los registros
+                </div>
             </div>
 
             <div class="stat-card stat-orange">
@@ -62,7 +90,9 @@
                     <span class="stat-icon">⏳</span>
                 </div>
                 <div class="stat-value">{{ stats.pendingOrders }}</div>
-                <div class="stat-foot">esperando atención</div>
+                <div class="stat-foot">
+                    <span class="stat-dot"></span> esperando atención
+                </div>
             </div>
 
             <div class="stat-card stat-blue">
@@ -71,7 +101,9 @@
                     <span class="stat-icon">🔄</span>
                 </div>
                 <div class="stat-value">{{ stats.activeOrders }}</div>
-                <div class="stat-foot">en proceso activo</div>
+                <div class="stat-foot">
+                    <span class="stat-dot"></span> en proceso activo
+                </div>
             </div>
 
             <div class="stat-card stat-green">
@@ -80,7 +112,9 @@
                     <span class="stat-icon">🚚</span>
                 </div>
                 <div class="stat-value">{{ stats.dispatchedOrders }}</div>
-                <div class="stat-foot">entregados al cliente</div>
+                <div class="stat-foot">
+                    <span class="stat-dot"></span> entregados al cliente
+                </div>
             </div>
 
             <div class="stat-card stat-pink">
@@ -89,7 +123,9 @@
                     <span class="stat-icon">🏷️</span>
                 </div>
                 <div class="stat-value">{{ stats.totalProducts }}</div>
-                <div class="stat-foot">productos registrados</div>
+                <div class="stat-foot">
+                    <span class="stat-dot"></span> inventario registrado
+                </div>
             </div>
 
         </section>
@@ -102,7 +138,7 @@
                 <div class="panel-head">
                     <div>
                         <h2>Pedidos recientes</h2>
-                        <p>Últimos 5 pedidos registrados</p>
+                        <p>Últimos 5 pedidos registrados en el sistema</p>
                     </div>
                     <a routerLink="/orders" class="panel-link">Ver todos →</a>
                 </div>
@@ -120,8 +156,15 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let order of recentOrders">
-                                <td class="col-id">#{{ order.id }}</td>
-                                <td>{{ order.customerName }}</td>
+                                <td class="col-id">
+                                    <span class="id-tag">#{{ order.id }}</span>
+                                </td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="customer-avatar">{{ order.customerName.charAt(0).toUpperCase() }}</div>
+                                        <span class="customer-name">{{ order.customerName }}</span>
+                                    </div>
+                                </td>
                                 <td>
                                     <span class="status-badge" [ngClass]="getStatusClass(order.status)">
                                         {{ getStatusLabel(order.status) }}
@@ -135,12 +178,13 @@
                 </div>
 
                 <div class="empty-panel" *ngIf="recentOrders.length === 0">
-                    <span>📋</span>
-                    <p>No hay pedidos registrados aún.</p>
+                    <span class="empty-icon">📋</span>
+                    <h3>Sin pedidos recientes</h3>
+                    <p>No hay pedidos registrados aún en la plataforma.</p>
                 </div>
             </section>
 
-            <!-- Accesos rápidos -->
+            <!-- Accesos rápidos y resumen -->
             <aside class="dash-panel quick-panel">
                 <div class="panel-head">
                     <div>
@@ -179,7 +223,10 @@
                     </div>
                     <ul class="product-mini-list">
                         <li *ngFor="let p of products.slice(0, 4)" class="product-mini-item">
-                            <span class="product-mini-name">{{ p.name }}</span>
+                            <div class="mini-prod-info">
+                                <span class="mini-prod-bullet">🍕</span>
+                                <span class="product-mini-name">{{ p.name }}</span>
+                            </div>
                             <span class="product-mini-price">{{ p.price | currency:'CLP':'symbol':'1.0-0' }}</span>
                         </li>
                     </ul>

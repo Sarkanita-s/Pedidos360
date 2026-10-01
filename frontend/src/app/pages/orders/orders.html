@@ -1,74 +1,124 @@
 <div class="orders-container">
 
-    <header class="orders-header">
-        <div>
-            <span class="section-label">GESTIÓN DE PEDIDOS</span>
-            <h1>Pedidos</h1>
-            <p>Revisa los pedidos y su estado actual.</p>
+    <!-- ── BARRA SUPERIOR DE NAVEGACIÓN ────────────────────────────── -->
+    <nav class="app-topbar" aria-label="Navegación principal">
+        <a routerLink="/dashboard" class="brand-wrapper">
+            <div class="brand-symbol">P</div>
+            <div class="brand-title">
+                <strong>Pedidos<span>360</span></strong>
+                <small>Gestión Integral</small>
+            </div>
+        </a>
+
+        <div class="nav-pills">
+            <a routerLink="/dashboard" class="nav-pill">
+                <span>📊</span> Dashboard
+            </a>
+            <a routerLink="/orders" class="nav-pill active">
+                <span>📦</span> Pedidos
+            </a>
+            <a routerLink="/catalog" class="nav-pill">
+                <span>🏷️</span> Catálogo
+            </a>
         </div>
 
         <div class="header-actions">
+            <div class="system-status-chip">
+                <span class="status-dot-pulse"></span>
+                <span>En línea</span>
+            </div>
+
+            <a routerLink="/dashboard" class="back-button">
+                <span>←</span> Dashboard
+            </a>
+
             <button class="primary-button" (click)="toggleForm()">
                 <span>{{ showForm ? '✕ Cerrar formulario' : '+ Nuevo pedido' }}</span>
             </button>
 
-            <button class="refresh-button" (click)="loadOrders()">
-                ↻ Actualizar
+            <button class="refresh-button" (click)="loadOrders()" [disabled]="loading">
+                <span [class.spinning]="loading">↻</span>
+                Actualizar
             </button>
+        </div>
+    </nav>
+
+    <!-- ── CABECERA DE LA PÁGINA ────────────────────────────── -->
+    <header class="orders-header">
+        <div class="header-intro">
+            <span class="section-label">GESTIÓN DE PEDIDOS</span>
+            <h1>Pedidos en curso</h1>
+            <p>Monitorea solicitudes de clientes, despachos y actualizaciones de estado en tiempo real.</p>
         </div>
     </header>
 
-    <p class="status-message success" *ngIf="successMessage">
-        {{ successMessage }}
-    </p>
+    <!-- ── MENSAJES DE ESTADO ────────────────────────────────── -->
+    <div class="status-message success" *ngIf="successMessage">
+        <span class="msg-icon">✅</span>
+        <span>{{ successMessage }}</span>
+    </div>
 
-    <p class="status-message" *ngIf="loading">
-        Cargando pedidos...
-    </p>
+    <div class="status-message info" *ngIf="loading">
+        <span class="msg-icon spinning">↻</span>
+        <span>Cargando listado de pedidos...</span>
+    </div>
 
-    <p class="status-message error" *ngIf="error">
-        {{ error }}
-    </p>
+    <div class="status-message error" *ngIf="error">
+        <span class="msg-icon">⚠️</span>
+        <span>{{ error }}</span>
+    </div>
 
-    <!-- FORMULARIO CREACIÓN DE PEDIDO -->
+    <!-- ── FORMULARIO CREACIÓN DE PEDIDO ────────────────────── -->
     <section class="order-form-card" *ngIf="showForm">
         <div class="form-card-header">
-            <div>
-                <h2>Nuevo pedido</h2>
-                <p>Ingresa los datos del cliente y los productos que solicita.</p>
+            <div class="form-card-badge">✨ Registro de Venta</div>
+            <h2>Crear nuevo pedido</h2>
+            <p>Ingresa los datos del cliente y selecciona los productos disponibles del catálogo.</p>
+        </div>
+
+        <div class="status-message error" *ngIf="formError">
+            <span class="msg-icon">⚠️</span>
+            <span>{{ formError }}</span>
+        </div>
+
+        <div class="form-group customer-field">
+            <label for="customerName">Nombre completo del cliente *</label>
+            <div class="input-wrapper">
+                <span class="input-icon">👤</span>
+                <input
+                    id="customerName"
+                    type="text"
+                    [(ngModel)]="customerName"
+                    placeholder="Ej: Juan Pérez Martínez"
+                    [disabled]="submitting"
+                />
             </div>
         </div>
 
-        <p class="status-wwwwmessage error" *ngIf="formError">
-            {{ formError }}
-        </p>
-
-        <div class="form-group">
-            <label for="customerName">Nombre del cliente *</label>
-            <input id="customerName" type="text" [(ngModel)]="customerName" placeholder="Ej: Juan Pérez"
-                [disabled]="submitting" />
-        </div>
-
+        <!-- CREADOR DE PRODUCTOS -->
         <div class="order-items-builder">
             <div class="builder-header">
-                <h3>Productos a pedir</h3>
+                <div>
+                    <h3>Productos solicitados</h3>
+                    <p>Agrega los ítems que conformarán el pedido</p>
+                </div>
+
                 <button type="button" class="secondary-button add-product-btn" (click)="addItem()"
                     [disabled]="submitting">
-                    + Agregar producto
+                    <span>+</span> Agregar producto
                 </button>
             </div>
 
             <div class="builder-rows">
                 <div class="builder-row" *ngFor="let item of orderItems; let i = index">
                     <div class="row-field field-product">
-                        <label>Producto</label>
+                        <label>Producto del catálogo</label>
                         <select [(ngModel)]="item.productId" (ngModelChange)="onProductSelected(item)"
                             [disabled]="submitting">
                             <option [ngValue]="null" disabled>-- Selecciona un producto --</option>
                             <option *ngFor="let prod of availableProducts" [ngValue]="prod.id"
                                 [disabled]="prod.stock <= 0">
-                                {{ prod.name }} ({{ prod.price | currency:'CLP':'symbol':'1.0-0' }} - Stock: {{
-                                prod.stock }})
+                                {{ prod.name }} ({{ prod.price | currency:'CLP':'symbol':'1.0-0' }} - Stock: {{ prod.stock }})
                             </option>
                         </select>
                     </div>
@@ -97,7 +147,7 @@
                     <div class="row-field field-action">
                         <label>&nbsp;</label>
                         <button type="button" class="delete-item-button" (click)="removeItem(i)" [disabled]="submitting"
-                            title="Quitar producto">
+                            title="Quitar producto de la lista">
                             ✕
                         </button>
                     </div>
@@ -105,8 +155,8 @@
             </div>
 
             <div class="builder-total-bar">
-                <span>Total del pedido:</span>
-                <strong>{{ calculateTotal() | currency:'CLP':'symbol':'1.0-0' }}</strong>
+                <span class="total-label">Total calculado del pedido:</span>
+                <strong class="total-amount">{{ calculateTotal() | currency:'CLP':'symbol':'1.0-0' }}</strong>
             </div>
         </div>
 
@@ -116,17 +166,21 @@
             </button>
 
             <button type="button" class="primary-button" (click)="submitOrder()" [disabled]="submitting">
-                {{ submitting ? 'Guardando pedido...' : 'Guardar pedido' }}
+                <span>{{ submitting ? 'Guardando pedido...' : 'Guardar y confirmar pedido' }}</span>
             </button>
         </div>
     </section>
 
+    <!-- ── LISTADO DE PEDIDOS ────────────────────────────────── -->
     <section class="orders-list" *ngIf="!loading && !error">
         <article class="order-card" *ngFor="let order of orders">
             <div class="order-header">
-                <div>
-                    <span class="order-id">Pedido #{{ order.id }}</span>
-                    <h2>{{ order.customerName }}</h2>
+                <div class="order-customer-wrap">
+                    <div class="order-avatar">{{ order.customerName.charAt(0).toUpperCase() }}</div>
+                    <div>
+                        <div class="order-id-badge">Pedido #{{ order.id }}</div>
+                        <h2>{{ order.customerName }}</h2>
+                    </div>
                 </div>
 
                 <div class="order-header-badges">
@@ -134,31 +188,34 @@
                         {{ getStatusLabel(order.status) }}
                     </span>
 
-                    <select class="status-select" [value]="order.status"
-                        (change)="updateStatus(order, $any($event.target).value)">
-                        <option value="PENDIENTE">Pendiente</option>
-                        <option value="ACEPTADO">Aceptado</option>
-                        <option value="PREPARANDO">Preparando</option>
-                        <option value="DESPACHADO">Despachado</option>
-                        <option value="CANCELADO">Cancelado</option>
-                    </select>
+                    <div class="status-select-wrap">
+                        <select class="status-select" [value]="order.status"
+                            (change)="updateStatus(order, $any($event.target).value)"
+                            title="Cambiar estado del pedido">
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="ACEPTADO">Aceptado</option>
+                            <option value="PREPARANDO">Preparando</option>
+                            <option value="DESPACHADO">Despachado</option>
+                            <option value="CANCELADO">Cancelado</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="order-details">
-                <div>
-                    <span>Fecha</span>
-                    <strong>{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+                <div class="detail-cell">
+                    <span class="detail-label">Fecha y Hora</span>
+                    <strong class="detail-value">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
                 </div>
 
-                <div>
-                    <span>Productos</span>
-                    <strong>{{ order.items.length }}</strong>
+                <div class="detail-cell">
+                    <span class="detail-label">Ítems solicitados</span>
+                    <strong class="detail-value">{{ order.items.length }} {{ order.items.length === 1 ? 'producto' : 'productos' }}</strong>
                 </div>
 
-                <div>
-                    <span>Total</span>
-                    <strong>
+                <div class="detail-cell text-right">
+                    <span class="detail-label">Total a cobrar</span>
+                    <strong class="detail-total-value">
                         {{ order.total | currency:'CLP':'symbol':'1.0-0' }}
                     </strong>
                 </div>
@@ -166,13 +223,13 @@
 
             <div class="order-card-actions">
                 <button type="button" class="detail-button" (click)="openDetail(order)" [id]="'btn-detail-' + order.id">
-                    Ver detalle
+                    <span>👁️</span> Ver detalle completo
                 </button>
             </div>
         </article>
     </section>
 
-    <!-- MODAL DETALLE DE PEDIDO -->
+    <!-- ── MODAL DETALLE DE PEDIDO ──────────────────────────── -->
     <div class="modal-backdrop" *ngIf="selectedOrder" (click)="closeDetail()" role="dialog" aria-modal="true"
         aria-labelledby="detail-modal-title">
         <div class="modal-card" (click)="$event.stopPropagation()">
@@ -198,7 +255,7 @@
                 <div class="detail-meta-grid">
                     <div class="meta-card">
                         <span class="meta-label">ID del pedido</span>
-                        <strong class="meta-value">#{{ selectedOrder.id }}</strong>
+                        <strong class="meta-value id-code">#{{ selectedOrder.id }}</strong>
                     </div>
 
                     <div class="meta-card">
@@ -234,8 +291,7 @@
                     <div class="detail-items-header">
                         <h3>Productos del pedido</h3>
                         <span class="items-count-badge">
-                            {{ selectedOrder.items.length }} {{ selectedOrder.items.length === 1 ? 'producto' :
-                            'productos' }}
+                            {{ selectedOrder.items.length }} {{ selectedOrder.items.length === 1 ? 'producto' : 'productos' }}
                         </span>
                     </div>
 
@@ -278,7 +334,7 @@
 
                 <!-- Total del pedido -->
                 <div class="detail-total-box">
-                    <span class="total-caption">Total del pedido</span>
+                    <span class="total-caption">Total final a pagar</span>
                     <strong class="total-figure">
                         {{ selectedOrder.total | currency:'CLP':'symbol':'1.0-0' }}
                     </strong>
@@ -293,10 +349,14 @@
         </div>
     </div>
 
+    <!-- ── ESTADO VACÍO ─────────────────────────────────────── -->
     <div class="empty-state" *ngIf="!loading && !error && orders.length === 0">
-        <span>📋</span>
+        <div class="empty-icon-bubble">📋</div>
         <h3>No hay pedidos todavía</h3>
-        <p>Los pedidos aparecerán aquí cuando se registren.</p>
+        <p>Los pedidos de tus clientes aparecerán aquí automáticamente o puedes registrar uno nuevo.</p>
+        <button class="primary-button" (click)="openForm()">
+            + Registrar primer pedido
+        </button>
     </div>
 
 </div>

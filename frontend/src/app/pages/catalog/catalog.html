@@ -1,73 +1,124 @@
 <div class="catalog-container">
 
-    <header class="catalog-header">
-        <div>
-            <span class="section-label">GESTIÓN DE INVENTARIO</span>
-            <h1>Catálogo de productos</h1>
+    <!-- ── BARRA SUPERIOR DE NAVEGACIÓN ────────────────────────────── -->
+    <nav class="app-topbar" aria-label="Navegación principal">
+        <a routerLink="/dashboard" class="brand-wrapper">
+            <div class="brand-symbol">P</div>
+            <div class="brand-title">
+                <strong>Pedidos<span>360</span></strong>
+                <small>Gestión Integral</small>
+            </div>
+        </a>
 
-            <p>Administra tus productos y revisa el stock disponible.</p>
+        <div class="nav-pills">
+            <a routerLink="/dashboard" class="nav-pill">
+                <span>📊</span> Dashboard
+            </a>
+            <a routerLink="/orders" class="nav-pill">
+                <span>📦</span> Pedidos
+            </a>
+            <a routerLink="/catalog" class="nav-pill active">
+                <span>🏷️</span> Catálogo
+            </a>
         </div>
 
         <div class="header-actions">
+            <div class="system-status-chip">
+                <span class="status-dot-pulse"></span>
+                <span>En línea</span>
+            </div>
+
             <a routerLink="/dashboard" class="back-button">
-                ← Dashboard
+                <span>←</span> Dashboard
             </a>
+
             <button class="primary-button" (click)="toggleForm()">
                 <span>{{ showForm && editingProductId === null ? '✕ Cerrar formulario' : '+ Nuevo producto' }}</span>
             </button>
         </div>
+    </nav>
+
+    <!-- ── CABECERA DE LA PÁGINA ────────────────────────────── -->
+    <header class="catalog-header">
+        <div class="header-intro">
+            <span class="section-label">GESTIÓN DE INVENTARIO</span>
+            <h1>Catálogo de productos</h1>
+            <p>Administra tus productos, actualiza precios y supervisa el stock disponible en tiempo real.</p>
+        </div>
     </header>
 
-    <section class="product-form" *ngIf="showForm">
-        <h2>{{ editingProductId !== null ? 'Editar producto' : 'Nuevo producto' }}</h2>
-
-        <p class="status-message error" *ngIf="error">
-            {{ error }}
-        </p>
-
-        <div class="form-group">
-            <label for="productName">Nombre</label>
-            <input
-                id="productName"
-                name="name"
-                type="text"
-                [(ngModel)]="newProduct.name"
-                placeholder="Ej: Pizza familiar"
-            />
+    <!-- ── FORMULARIO DE PRODUCTO ───────────────────────────── -->
+    <section class="product-form-card" *ngIf="showForm">
+        <div class="form-card-header">
+            <div class="form-card-badge">
+                {{ editingProductId !== null ? '✏️ Modo edición' : '✨ Nuevo registro' }}
+            </div>
+            <h2>{{ editingProductId !== null ? 'Editar producto' : 'Nuevo producto' }}</h2>
+            <p>Ingresa la información detallada del artículo para el catálogo de Pedidos360.</p>
         </div>
 
-        <div class="form-group">
-            <label for="productDescription">Descripción</label>
-            <input
-                id="productDescription"
-                name="description"
-                type="text"
-                [(ngModel)]="newProduct.description"
-                placeholder="Descripción del producto"
-            />
+        <div class="status-message error" *ngIf="error">
+            <span class="msg-icon">⚠️</span>
+            <span>{{ error }}</span>
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="productPrice">Precio</label>
-                <input
-                    id="productPrice"
-                    name="price"
-                    type="number"
-                    [(ngModel)]="newProduct.price"
-                    min="1"
-                />
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="productName">Nombre del producto *</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🏷️</span>
+                    <input
+                        id="productName"
+                        name="name"
+                        type="text"
+                        [(ngModel)]="newProduct.name"
+                        placeholder="Ej: Pizza familiar cuatro estaciones"
+                    />
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="productDescription">Descripción comercial</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">📝</span>
+                    <input
+                        id="productDescription"
+                        name="description"
+                        type="text"
+                        [(ngModel)]="newProduct.description"
+                        placeholder="Ingredientes principales, tamaño o características..."
+                    />
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="productStock">Stock</label>
-                <input
-                    id="productStock"
-                    name="stock"
-                    type="number"
-                    [(ngModel)]="newProduct.stock"
-                    min="0"
-                />
+                <label for="productPrice">Precio de venta (CLP) *</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">💲</span>
+                    <input
+                        id="productPrice"
+                        name="price"
+                        type="number"
+                        [(ngModel)]="newProduct.price"
+                        min="1"
+                        placeholder="0"
+                    />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="productStock">Stock disponible (unidades) *</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">📦</span>
+                    <input
+                        id="productStock"
+                        name="stock"
+                        type="number"
+                        [(ngModel)]="newProduct.stock"
+                        min="0"
+                        placeholder="0"
+                    />
+                </div>
             </div>
         </div>
 
@@ -86,88 +137,104 @@
         </div>
     </section>
 
+    <!-- ── RESUMEN DEL CATÁLOGO ─────────────────────────────── -->
     <section class="catalog-summary">
         <div class="summary-card">
-            <div class="summary-icon">📦</div>
-            <div>
-                <span>Total de productos</span>
-                <strong>{{ products.length }}</strong>
+            <div class="summary-icon icon-purple">📦</div>
+            <div class="summary-data">
+                <span class="summary-title">Total de productos</span>
+                <strong class="summary-number">{{ products.length }}</strong>
+                <span class="summary-hint">referencias activas</span>
             </div>
         </div>
 
         <div class="summary-card">
-            <div class="summary-icon">📊</div>
-            <div>
-                <span>Unidades disponibles</span>
-                <strong>{{ getTotalStock() }}</strong>
+            <div class="summary-icon icon-green">📊</div>
+            <div class="summary-data">
+                <span class="summary-title">Unidades disponibles</span>
+                <strong class="summary-number">{{ getTotalStock() }}</strong>
+                <span class="summary-hint">stock total acumulado</span>
             </div>
         </div>
     </section>
 
+    <!-- ── BARRA DE HERRAMIENTAS ────────────────────────────── -->
     <div class="catalog-toolbar">
         <div>
-            <h2>Productos</h2>
-            <p>Listado actual del inventario</p>
+            <h2>Inventario de productos</h2>
+            <p>Listado actualizado de productos registrados en el sistema</p>
         </div>
 
-        <button class="secondary-button" (click)="loadProducts()">
-            ↻ Actualizar
+        <button class="refresh-button" (click)="loadProducts()" [disabled]="loading">
+            <span [class.spinning]="loading">↻</span>
+            Actualizar lista
         </button>
     </div>
 
-    <p class="status-message" *ngIf="loading">
-        Cargando productos...
-    </p>
+    <!-- ── ESTADOS DE CARGA Y ERROR ─────────────────────────── -->
+    <div class="status-message info" *ngIf="loading">
+        <span class="msg-icon spinning">↻</span>
+        <span>Cargando productos del catálogo...</span>
+    </div>
 
-    <p class="status-message error" *ngIf="error && !showForm">
-        {{ error }}
-    </p>
+    <div class="status-message error" *ngIf="error && !showForm">
+        <span class="msg-icon">⚠️</span>
+        <span>{{ error }}</span>
+    </div>
 
+    <!-- ── CUADRÍCULA DE PRODUCTOS ──────────────────────────── -->
     <section class="products-grid" *ngIf="!loading && (!error || showForm)">
         <article class="product-card" *ngFor="let product of products">
             <div class="product-top">
-                <div class="product-icon">🍕</div>
+                <div class="product-icon-box">
+                    <span class="product-emoji">🍕</span>
+                </div>
 
                 <span class="stock-badge" [class.low-stock]="product.stock <= 5">
-                    {{ product.stock > 5 ? 'En stock' : 'Stock bajo' }}
+                    <span class="stock-dot"></span>
+                    {{ product.stock > 5 ? 'En stock (' + product.stock + ')' : 'Stock bajo (' + product.stock + ')' }}
                 </span>
             </div>
 
             <div class="product-info">
                 <h3>{{ product.name }}</h3>
-                <p>{{ product.description }}</p>
+                <p>{{ product.description || 'Sin descripción adicional registrada.' }}</p>
             </div>
 
             <div class="product-details">
-                <div>
-                    <span>Precio</span>
-                    <strong>
+                <div class="detail-col">
+                    <span class="detail-label">Precio</span>
+                    <strong class="detail-price">
                         {{ product.price | currency:'CLP':'symbol':'1.0-0' }}
                     </strong>
                 </div>
 
-                <div>
-                    <span>Disponibles</span>
-                    <strong>{{ product.stock }} unidades</strong>
+                <div class="detail-col text-right">
+                    <span class="detail-label">Disponibilidad</span>
+                    <strong class="detail-stock">{{ product.stock }} uds.</strong>
                 </div>
             </div>
 
             <div class="product-actions">
                 <button class="edit-button" (click)="editProduct(product)">
-                    Editar
+                    <span>✏️</span> Editar
                 </button>
 
                 <button class="delete-button" (click)="deleteProduct(product.id)">
-                    Eliminar
+                    <span>🗑️</span> Eliminar
                 </button>
             </div>
         </article>
     </section>
 
+    <!-- ── ESTADO VACÍO ─────────────────────────────────────── -->
     <div class="empty-state" *ngIf="!loading && !error && products.length === 0">
-        <span>📦</span>
-        <h3>No hay productos todavía</h3>
-        <p>Agrega tu primer producto para comenzar.</p>
+        <div class="empty-icon-bubble">📦</div>
+        <h3>No hay productos registrados</h3>
+        <p>Comienza agregando tu primer producto con el botón superior para habilitar ventas.</p>
+        <button class="primary-button" (click)="openCreateForm()">
+            + Crear primer producto
+        </button>
     </div>
 
 </div>
