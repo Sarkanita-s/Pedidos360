@@ -20,13 +20,16 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final OrderEventProducer orderEventProducer;
 
     public OrderService(
             OrderRepository orderRepository,
-            ProductRepository productRepository) {
+            ProductRepository productRepository,
+            OrderEventProducer orderEventProducer) {
 
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.orderEventProducer = orderEventProducer;
     }
 
     public List<Order> getAllOrders(Jwt jwt) {
@@ -60,7 +63,25 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDIENTE);
         order.setOwnerOid(getOwnerOid(jwt));
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // Publicar evento a RabbitMQ de forma asíncrona
+        try {
+            com.pedidos360.backend.dto.OrderEventMessage event = new com.pedidos360.backend.dto.OrderEventMessage(
+                    savedOrder.getId(),
+                    "ORDER_CREATED",
+                    savedOrder.getStatus().name(),
+                    savedOrder.getOwnerOid(),
+                    "Nuevo pedido registrado por cliente"
+            );
+            orderEventProducer.publishOrderCreated(event);
+            orderEventProducer.publishNotification(event, "pedidos.notif.email");
+        } catch (Exception ex) {
+            // Manejo de resiliencia: si el broker tiene problemas temporales, no aborta la transacción principal
+            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento RabbitMQ para pedido {}", savedOrder.getId(), ex);
+        }
+
+        return savedOrder;
     }
 
     @Transactional
@@ -129,8 +150,23 @@ public class OrderService {
         }
 
         order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
 
-        return orderRepository.save(order);
+        try {
+            com.pedidos360.backend.dto.OrderEventMessage event = new com.pedidos360.backend.dto.OrderEventMessage(
+                    updatedOrder.getId(),
+                    "ORDER_STATUS_CHANGED",
+                    updatedOrder.getStatus().name(),
+                    updatedOrder.getOwnerOid(),
+                    "Estado de pedido actualizado a " + newStatus
+            );
+            orderEventProducer.publishOrderStatusChanged(event);
+            orderEventProducer.publishNotification(event, "pedidos.notif.status." + newStatus.name().toLowerCase());
+        } catch (Exception ex) {
+            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento RabbitMQ para pedido {}", updatedOrder.getId(), ex);
+        }
+
+        return updatedOrder;
     }
 
     private String getOwnerOid(Jwt jwt) {
