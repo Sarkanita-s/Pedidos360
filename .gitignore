@@ -1,0 +1,76 @@
+# ========================================================
+# ARCHIVOS COMPILADOS Y BUILD ARTIFACTS
+# ========================================================
+target/
+**/target/
+dist/
+**/dist/
+build/
+**/build/
+out/
+*.class
+*.jar
+*.war
+*.out
+
+# ========================================================
+# DEPENDENCIAS Y ENTORNOS
+# ========================================================
+node_modules/
+**/node_modules/
+.angular/
+venv/
+markitdown-venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# ========================================================
+# VARIABLES DE ENTORNO Y SECRETOS (EP5 / EP6 OBLIGATORIO)
+# ========================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cer
+*.crt
+*.p12
+*.jks
+credentials.json
+secrets.yml
+
+# ========================================================
+# LOGS Y TEMPORALES
+# ========================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+tmp/
+/tmp/
+
+# ========================================================
+# IDES Y EDITORES
+# ========================================================
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+
+# ========================================================
+# SISTEMA OPERATIVO
+# ========================================================
+.DS_Store
+Thumbs.db
