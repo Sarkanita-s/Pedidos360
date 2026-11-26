@@ -29,9 +29,6 @@ public class KafkaConfig {
     private String bootstrapServers;
 
     // ========================================================
-    // TÓPICOS EVALUADOS (EP5 / EP6)
-    // 2 tópicos con 3 particiones y factor de replicación 3
-    // ========================================================
     public static final String TOPIC_ORDER_EVENTS = "pedidos.order.events";
     public static final String TOPIC_AUDIT_EVENTS = "pedidos.audit.events";
 
@@ -133,7 +130,8 @@ public class KafkaConfig {
     }
 
     /**
-     * Manejador de errores para Kafka con reintentos y desvío automático a Dead Letter Topic (DLT)
+     * Manejador de errores para Kafka con reintentos y desvío automático a Dead
+     * Letter Topic (DLT)
      */
     @Bean
     public DefaultErrorHandler errorHandler(KafkaTemplate<Object, Object> kafkaTemplate) {
@@ -150,8 +148,7 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
             ConsumerFactory<Object, Object> consumerFactory,
             DefaultErrorHandler errorHandler) {
-        ConcurrentKafkaListenerContainerFactory<Object, Object> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setCommonErrorHandler(errorHandler);
         return factory;

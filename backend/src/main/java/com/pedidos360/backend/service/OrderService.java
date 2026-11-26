@@ -75,13 +75,14 @@ public class OrderService {
                     "ORDER_CREATED",
                     savedOrder.getStatus().name(),
                     savedOrder.getOwnerOid(),
-                    "Nuevo pedido registrado por cliente"
-            );
+                    "Nuevo pedido registrado por cliente");
             orderEventProducer.publishOrderCreated(event);
             orderEventProducer.publishNotification(event, "pedidos.notif.email");
         } catch (Exception ex) {
-            // Manejo de resiliencia: si el broker tiene problemas temporales, no aborta la transacción principal
-            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento RabbitMQ para pedido {}", savedOrder.getId(), ex);
+            // Manejo de resiliencia: si el broker tiene problemas temporales, no aborta la
+            // transacción principal
+            org.slf4j.LoggerFactory.getLogger(OrderService.class)
+                    .error("Error publicando evento RabbitMQ para pedido {}", savedOrder.getId(), ex);
         }
 
         // Publicar evento a Apache Kafka en tópicos order y audit (EP5/EP6)
@@ -93,11 +94,11 @@ public class OrderService {
                     savedOrder.getCustomerName(),
                     savedOrder.getTotal() != null ? savedOrder.getTotal().doubleValue() : 0.0,
                     savedOrder.getOwnerOid(),
-                    "Nuevo pedido registrado en clúster Kafka con réplicas=3"
-            );
+                    "Nuevo pedido registrado en clúster Kafka con réplicas=3");
             orderKafkaProducer.sendOrderEvent(kafkaEvent);
         } catch (Exception ex) {
-            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento Kafka para pedido {}", savedOrder.getId(), ex);
+            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento Kafka para pedido {}",
+                    savedOrder.getId(), ex);
         }
 
         return savedOrder;
@@ -177,12 +178,12 @@ public class OrderService {
                     "ORDER_STATUS_CHANGED",
                     updatedOrder.getStatus().name(),
                     updatedOrder.getOwnerOid(),
-                    "Estado de pedido actualizado a " + newStatus
-            );
+                    "Estado de pedido actualizado a " + newStatus);
             orderEventProducer.publishOrderStatusChanged(event);
             orderEventProducer.publishNotification(event, "pedidos.notif.status." + newStatus.name().toLowerCase());
         } catch (Exception ex) {
-            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento RabbitMQ para pedido {}", updatedOrder.getId(), ex);
+            org.slf4j.LoggerFactory.getLogger(OrderService.class)
+                    .error("Error publicando evento RabbitMQ para pedido {}", updatedOrder.getId(), ex);
         }
 
         // Publicar cambio de estado a Apache Kafka (EP5/EP6)
@@ -194,11 +195,11 @@ public class OrderService {
                     updatedOrder.getCustomerName(),
                     updatedOrder.getTotal() != null ? updatedOrder.getTotal().doubleValue() : 0.0,
                     updatedOrder.getOwnerOid(),
-                    "Estado de pedido actualizado a " + newStatus + " en Kafka"
-            );
+                    "Estado de pedido actualizado a " + newStatus + " en Kafka");
             orderKafkaProducer.sendOrderEvent(kafkaEvent);
         } catch (Exception ex) {
-            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento Kafka para pedido {}", updatedOrder.getId(), ex);
+            org.slf4j.LoggerFactory.getLogger(OrderService.class).error("Error publicando evento Kafka para pedido {}",
+                    updatedOrder.getId(), ex);
         }
 
         return updatedOrder;

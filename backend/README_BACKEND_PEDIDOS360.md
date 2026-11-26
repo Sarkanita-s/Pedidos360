@@ -414,7 +414,37 @@ Si no existe stock suficiente, la API devuelve `409 Conflict`:
 
 ------------------------------------------------------------------------
 
-## 11. Resumen de archivos
+## 11. Integración de Mensajería: RabbitMQ y Apache Kafka
+
+### 11.1. Apache Kafka (EP5 / EP6)
+
+El backend se integra a un clúster de **3 brokers de Kafka** gestionados por un ensamble de **3 nodos ZooKeeper**:
+
+- **Tópico 1:** `pedidos.order.events` (3 particiones, factor de replicación 3, retención 7 días).
+- **Tópico 2:** `pedidos.audit.events` (3 particiones, factor de replicación 3, retención 7 días).
+- **Dead Letter Topics (DLT):** `pedidos.order.events.DLT` y `pedidos.audit.events.DLT`.
+- **Consumer Groups:** `pedidos360-order-group`, `pedidos360-audit-group`, `pedidos360-dlt-group`.
+- **Manejo de Errores:** `DefaultErrorHandler` con 2 reintentos (FixedBackOff 1s) y desvío a DLT con `DeadLetterPublishingRecoverer`.
+
+#### Endpoints de administración Kafka:
+- `GET /api/admin/kafka/status`: Inspecciona tópicos, particiones, réplicas y consumer groups.
+- `POST /api/admin/kafka/simulate`: Simula la publicación de eventos con opción `forceError=true` para forzar desvío a DLT.
+
+### 11.2. Clúster RabbitMQ (EP3 / EP4)
+
+Clúster de 2 nodos (`rabbit1:5672`, `rabbit2:5673`) con ACK manual y colas DLQ asociadas:
+- `pedidos.created.queue` -> `pedidos.created.dlq`
+- `pedidos.status.queue` -> `pedidos.status.dlq`
+- `pedidos.notification.queue` -> `pedidos.notification.dlq`
+
+#### Endpoints de administración RabbitMQ:
+- `GET /api/admin/queues/status`: Estado y conteo de mensajes en colas y DLQs.
+- `POST /api/admin/queues/simulate`: Simula mensajes y prueba de DLQ.
+- `POST /api/admin/queues/purge/{queueName}`: Purga de colas.
+
+------------------------------------------------------------------------
+
+## 12. Resumen de archivos
 
 Cada descripción tiene como máximo 30 palabras.
 
@@ -474,22 +504,40 @@ Cada descripción tiene como máximo 30 palabras.
                                        en respuestas HTTP con mensajes
                                        JSON claros.
 
-  `SecurityConfig.java`                Configura la autenticación Basic
-                                       Auth y desactiva CSRF para las
-                                       pruebas actuales.
+  `SecurityConfig.java`                Configura la autenticación con Microsoft
+                                       Entra ID (JWT) y políticas CORS.
 
-  `application.properties`             Contiene la configuración de la
-                                       aplicación, conexión a PostgreSQL y
-                                       puerto del servidor.
+  `RabbitMQConfig.java`                Configuración de Exchanges (Direct, Topic,
+                                       DLX), Colas y Bindings en clúster RabbitMQ.
 
-  `pom.xml`                            Define las dependencias, plugins y
-                                       configuración de compilación de
-                                       Maven.
+  `KafkaConfig.java`                   Configura 2 tópicos evaluados (RF=3, 3 particiones),
+                                       tópicos DLT, templates y ErrorHandler.
+
+  `OrderKafkaProducer.java`            Publica eventos asíncronos en tópicos de Kafka
+                                       con clave de partición orderId.
+
+  `OrderKafkaConsumer.java`            Consumidores Kafka en Consumer Groups con
+                                       ACK y gestión de Dead Letter Topic.
+
+  `OrderKafkaEvent.java`               DTO para eventos de ciclo de vida del pedido
+                                       transmitidos a través de Kafka.
+
+  `KafkaAdminController.java`          Expone endpoints REST para inspeccionar clúster
+                                       Kafka y simular eventos/fallas DLT.
+
+  `QueueAdminController.java`          Expone endpoints REST para monitoreo y simulación
+                                       de colas y DLQ en RabbitMQ.
+
+  `application.properties`             Contiene la configuración de PostgreSQL,
+                                       RabbitMQ clúster y Kafka 3 brokers.
+
+  `pom.xml`                            Define las dependencias (Spring Boot, Kafka,
+                                       AMQP, JPA, Security, etc.).
   ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-## 12. Errores HTTP frecuentes
+## 13. Errores HTTP frecuentes
 
   -----------------------------------------------------------------------
   Código                              Significado

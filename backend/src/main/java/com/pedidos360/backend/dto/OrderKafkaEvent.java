@@ -15,12 +15,12 @@ public class OrderKafkaEvent implements Serializable {
     private String customerName;
     private Double total;
     private String ownerOid;
-    private LocalDateTime timestamp;
+    private String timestamp;
     private String details;
 
     public OrderKafkaEvent() {
         this.eventId = UUID.randomUUID().toString();
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now().toString();
     }
 
     public OrderKafkaEvent(Long orderId, String eventType, String status, String customerName, Double total, String ownerOid, String details) {
@@ -31,7 +31,7 @@ public class OrderKafkaEvent implements Serializable {
         this.customerName = customerName;
         this.total = total;
         this.ownerOid = ownerOid;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now().toString();
         this.details = details;
     }
 
@@ -91,11 +91,11 @@ public class OrderKafkaEvent implements Serializable {
         this.ownerOid = ownerOid;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

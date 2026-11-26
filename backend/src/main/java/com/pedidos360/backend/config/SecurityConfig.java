@@ -50,7 +50,7 @@ public class SecurityConfig {
                                                                 org.springframework.http.HttpMethod.OPTIONS,
                                                                 "/**")
                                                 .permitAll()
-                                                .requestMatchers("/error").permitAll()
+                                                .requestMatchers("/error", "/api/admin/**").permitAll()
                                                 .anyRequest().authenticated())
 
                                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(

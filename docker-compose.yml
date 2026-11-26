@@ -196,10 +196,6 @@ services:
     networks:
       - pedidos360-network
 
-  # ========================================================
-  # PROVISIÓN AUTOMÁTICA DE TÓPICOS KAFKA (EP5 / EP6)
-  # 2 Tópicos con 3 particiones y factor de replicación 3 + DLT
-  # ========================================================
   kafka-init:
     image: confluentinc/cp-kafka:7.5.0
     container_name: pedidos360-kafka-init
